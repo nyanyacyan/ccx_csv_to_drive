@@ -187,113 +187,21 @@ class SingleProcess:
             # URLのアクセス→ID入力→Passの入力→ログイン
             self.login.flow_login_id_input_url( login_info=login_info, login_url=gss_row_data[self.const_gss_info["URL"]], id_text=gss_row_data[self.const_gss_info["ID"]], pass_text=gss_row_data[self.const_gss_info["PASSWORD"]], gss_info=gss_info, err_datetime_cell=err_datetime_cell, err_cmt_cell=err_cmt_cell )
 
-            # 【絞り込み条件】指定した条件に該当する読者を表示をクリック
-            self.click_element.clickElement(value=self.const_element["MATCH_RULES_VOL"])
-            self.logger.warning(f'{self.__class__.__name__} 指定した条件に該当する読者を表示をクリック: 実施済み')
-            self.selenium._random_sleep()
+            # フォロワー分析クリック → フォロワーチャート
+            # ダウンロードFlow
 
-            self.get_element.unlockDisplayNone()
+            # エンゲージメント分析をクリック → エンゲージメントの推移、プロフィールインサイトチャート
+            # ダウンロードFlow
+
+            # 投稿一覧 → インサイト投稿一覧
+            # ダウンロードFlow
+
+            # ストーリーズ分析をクリック → ストーリーズ投稿一覧
+            # ダウンロードFlow
 
 
-            # ドロップダウン → 配信基準日時（日付）→
-            self.get_element._select_element(by=self.const_element["MATCH_CHOICE_BY"], value=self.const_element["MATCH_CHOICE_VOL"], select_value=self.const_element["MATCH_CHOICE_SELECT_VOL"])
-            self.logger.warning(f'{self.__class__.__name__} 配信基準日時（日付）: 実施済み')
-            self.selenium._random_sleep()
+            # DriveアップロードFlow
 
-
-            # ドロップダウン 次と完全一致
-            self.get_element._select_element(by=self.const_element["DELIVERY_SETTING_SELECT_BY"], value=self.const_element["DELIVERY_SETTING_SELECT_VALUE"], select_value=self.const_element["SETTING_SELECT_VALUE"])
-            self.logger.warning(f'{self.__class__.__name__} 次と完全一致（ドロップダウン）: 実施済み')
-            self.selenium._random_sleep()
-
-            # 絞り込みをクリック →
-            self.click_element.clickElement(value=self.const_element["SORTING_VOL"])
-            self.logger.warning(f'{self.__class__.__name__} 絞り込みをクリック: 実施済み')
-            self.selenium._random_sleep()
-
-            # 前日を入力
-            today = date.today()
-            yesterday = today - timedelta(days=1)
-            self.logger.debug(f'date_data: {yesterday}')
-            fixed_yesterday_data = "00" + str(yesterday)
-            self.logger.debug(f'fixed_date_data: {fixed_yesterday_data}')
-            self.click_element.clickClearInput(value=self.const_element["DATE_INPUT_VOL"], inputText=fixed_yesterday_data)
-            self.logger.warning(f'{self.__class__.__name__} 日時の入力: 実施済み')
-            self.selenium._random_sleep()
-
-            # 絞り込みをクリック →
-            self.click_element.clickElement(value=self.const_element["SORTING_VOL"])
-            self.logger.warning(f'{self.__class__.__name__} 絞り込みをクリック: 実施済み')
-            self.selenium._random_sleep()
-
-            # CSV出力をクリック →
-            self.click_element.clickElement(value=self.const_element["CSV_OUTPUT_VOL"])
-            self.logger.warning(f'{self.__class__.__name__} CSV出力をクリック: 実施済み')
-            self.selenium._random_sleep()
-
-            # CSV移動
-            csv_path = self.file_move.move_csv_dl_to_inputDir(sub_dir_name=gss_row_data[self.const_gss_info["NAME"]], file_name_head=self.const_element["CSV_FILE_NAME"], extension=self.const_element["CSV_EXTENSION"])
-
-            # CSVの読み込み
-            download_csv_df = pd.read_csv(csv_path, encoding="shift_jis")
-            self.logger.debug(f'ダウンロードしたCSVのdf: {download_csv_df.head()}')
-            downloads_names_list = download_csv_df[self.const_gss_info["LINE_FRIEND_ID"]].tolist()
-            self.logger.debug(f'downloads_names_list: {downloads_names_list}')
-
-            # GSSへアクセス→gss_row_dataにあるURLへアクセス
-            worksheet_name = gss_row_data[self.const_gss_info["NAME"]]
-            self.logger.debug(f'worksheet_name: {worksheet_name}')
-            gss_df = self.gss_read._get_gss_df_to_gui(gui_info=self.const_gss_info, sheet_url=self.const_gss_info["SHEET_URL"], worksheet_name=worksheet_name)
-            if gss_df.empty:
-                self.logger.info("対象のスプレッドシートは空です。全データを書き込み対象とします。")
-
-                diff_name_list = downloads_names_list
-                none_row_num = 1  # ヘッダー行を除いた次の行
-            else:
-                gss_names_list = gss_df[self.const_gss_info["LINE_FRIEND_ID"]].tolist()
-                self.logger.debug(f'gss_names_list: \n{gss_names_list}')
-
-                # CSVと既存との付け合せを行い差異リストを生成
-                diff_name_list = [name for name in downloads_names_list if name not in gss_names_list]
-                self.logger.debug(f'diff_name_list: {diff_name_list}')
-
-                # 空白の行数
-                none_row_num = self.gss_read._get_input_row_num(df=gss_df)
-
-            # データフレームをフィルターかける（書き込むデータ飲みにする）
-            df_row_filtered = download_csv_df[download_csv_df[self.const_gss_info["LINE_FRIEND_ID"]].isin(diff_name_list)]
-            df_filtered = df_row_filtered[self.const_gss_info["CHOICE_COL"]]
-            self.logger.debug(f'必要な情報だけのDataFrame: {df_filtered.head()}')
-
-            # 行ごとに処理
-            for i, row in df_filtered.iterrows():
-                row_num = i + 1
-                get_gss_row_dict = row.to_dict()
-
-                # LINE友達IDのcell
-                friend_id_cell = self.select_cell.get_cell_address( gss_row_dict=get_gss_row_dict, col_name=self.const_gss_info["LINE_FRIEND_ID"], row_num=row_num, )
-
-                # LINE登録名のcell
-                line_name_cell = self.select_cell.get_cell_address( gss_row_dict=get_gss_row_dict, col_name=self.const_gss_info["LINE_NAME"], row_num=row_num, )
-
-                # 登録日にタイムスタンプのcell → Cにする → col_num=3
-                date_cell = self.select_cell.get_cell_address_add_col( col_num=3, col_name=self.const_gss_info["SIGN_UP_DATE"], row_num=row_num, )
-
-                # LINE友達IDの入力
-                self.gss_write.write_gss_base_cell_address(gss_info=self.const_gss_info, sheet_url=self.const_gss_info["SHEET_URL"], worksheet_name=worksheet_name, cell_address=friend_id_cell, input_value=get_gss_row_dict[self.const_gss_info["LINE_FRIEND_ID"]])
-                time.sleep(1)
-
-                # LINE登録名を入力
-                self.gss_write.write_gss_base_cell_address(gss_info=self.const_gss_info, sheet_url=self.const_gss_info["SHEET_URL"], worksheet_name=worksheet_name, cell_address=line_name_cell, input_value=get_gss_row_dict[self.const_gss_info["LINE_NAME"]])
-                time.sleep(1)
-
-                # 登録日にタイムスタンプを入力→C
-                self.logger.debug(f'date_cell: {date_cell}')
-                self.logger.debug(f'self.date_only_stamp: {self.date_only_stamp}')
-                self.gss_write.write_gss_base_cell_address(gss_info=self.const_gss_info, sheet_url=self.const_gss_info["SHEET_URL"], worksheet_name=worksheet_name, cell_address=date_cell, input_value=self.date_only_stamp)
-                time.sleep(1)
-
-                self.logger.info(f'LINE登録名: {get_gss_row_dict[self.const_gss_info["LINE_NAME"]]} スプシ書込完了')
 
             # 実施を成功欄に日付を書込をする
             self.gss_write.write_data_by_url(gss_info, complete_cell, input_data=str(self.timestamp_two))

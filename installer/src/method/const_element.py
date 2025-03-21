@@ -21,8 +21,8 @@ class GssInfo(Enum):
 
     UTAGE = {
         "JSON_KEY_NAME": "sns-auto-430920-08274ad68b41.json",
-        "SHEET_URL": "https://docs.google.com/spreadsheets/d/143M93N4Zr59rNrPCbrsLPDdyt2UakvEN8a1WwHncH7k/edit?gid=0#gid=0",
-        "WORKSHEET_NAME": "取得シート",
+        "SHEET_URL": "https://docs.google.com/spreadsheets/d/1G8ME4Oy7H1cEjN5qKIYf9SBx25c9DxonnvFv8tQfkGM/edit?gid=675546558#gid=675546558",
+        "WORKSHEET_NAME": "アカウント",
 
         # column名
         "URL": "URL",
@@ -53,6 +53,8 @@ class GssInfo(Enum):
 class LoginInfo(Enum):
 
     UTAGE = {
+        "LOGIN_URL": "https://social.ccxcloud.io/login",
+        "HOME_URL": "",
         "ID_BY": "xpath",
         "ID_VALUE": "//input[@placeholder='メールアドレス']",
         "PASS_BY": "xpath",
