@@ -4,12 +4,14 @@
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 # import
+import os
 from typing import Dict
 from datetime import datetime
 from selenium.webdriver.chrome.webdriver import WebDriver
 
 # 自作モジュール
 from method.base.utils.logger import Logger
+from method.base.utils.path import BaseToPath
 from method.base.selenium.chrome import ChromeManager
 from method.base.selenium.loginWithId import SingleSiteIDLogin
 from method.base.selenium.seleniumBase import SeleniumBasicOperations
@@ -24,9 +26,10 @@ from method.base.spreadsheet.err_checker_write import GssCheckerErrWrite
 from method.base.utils.popup import Popup
 from method.base.utils.file_move import FileMove
 from method.base.utils.zip import ZipOperation
+from method.base.utils.search_file_name_head import SearchFileNameHead
 
 # const
-from method.const_element import GssInfo, LoginInfo, ErrCommentInfo, PopUpComment
+from method.const_element import GssInfo, LoginInfo, ErrCommentInfo, PopUpComment, FollowerAnalysisElement
 
 deco = Decorators()
 
@@ -58,51 +61,69 @@ class FollowerDownloadFlow:
         self.select_cell = GssSelectCell()
         self.gss_check_err_write = GssCheckerErrWrite()
         self.popup = Popup()
+        self.path = BaseToPath()
         self.file_move = FileMove()
         self.zip = ZipOperation()
+        self.search_file_name_head = SearchFileNameHead()
 
         # const
-        self.const_gss_info = GssInfo.LGRAM.value
-        self.const_login_info = LoginInfo.LGRAM.value
-        self.const_err_cmt_dict = ErrCommentInfo.LGRAM.value
-        self.popup_cmt = PopUpComment.LGRAM.value
+        self.const_gss_info = GssInfo.CCX.value
+        self.const_login_info = LoginInfo.CCX.value
+        self.const_err_cmt_dict = ErrCommentInfo.CCX.value
+        self.popup_cmt = PopUpComment.CCX.value
 
-
+        # downloads_const
+        self.const_download_kinds_info = FollowerAnalysisElement.CCX.value
 
         self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
 
     ####################################################################################
     # 準備工程 スプシチェッカー > 写真のダウンロード > 動画のダウンロード
 
-    def downloads_process( self, gss_row_data: Dict, downloads_const_dict: Dict, downloads_dir: str, err_datetime_cell: str, err_cmt_cell: str, ):
+    def downloads_process( self, gss_row_data: Dict, downloads_dir: str, err_datetime_cell: str, err_cmt_cell: str, ):
         try:
             pass
             # 対象の分析をクリック
-            self.click_element.clickElement(analysis_value=downloads_const_dict["analysis_value"])
+            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["analysis_value"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
             self.selenium._random_sleep()
 
             # 一括ダウンロードをクリック
-            self.click_element.clickElement(analysis_value=downloads_const_dict["analysis_value"])
+            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["analysis_value"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
             self.selenium._random_sleep()
 
             # Zipファイルの移動 → result_output → アカウント → date → *zip
-            new_zip_path = self.file_move.move_csv_dl_to_outputDir(sub_dir_name=gss_row_data[self.const_gss_info["NAME"]], file_name_head=self.const_element["ZIP_FILE_NAME"], extension=self.const_element["ZIP_EXTENSION"])
+            new_zip_path = self.file_move.move_csv_dl_to_outputDir(sub_dir_name=gss_row_data[self.const_gss_info["NAME"]], file_name_head=self.const_download_kinds_info["ZIP_FILE_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
 
             # zipの解凍
-            self.zip.unzip_same_position(zipfile_path=new_zip_path)
+            unzip_folder_dir = self.zip.unzip_same_position(zipfile_path=new_zip_path)
 
             # 対象ファイルのPathを取得
+            discovery_file = self.search_file_name_head.get_search_file_name_head(search_folder_path=unzip_folder_dir, file_name_head=self.const_download_kinds_info["CSV_FILE_HEAD_NAME"], extension=self.const_download_kinds_info["CSV_EXTENSION"])
+
+            # アップロード先のPathを取得
+            base_dir = os.path.dirname(discovery_file)  # ファイルまでのPathを取得
+            file_name, extension = os.path.splitext(os.path.basename(base_dir))  # file_nameのみ取得
+            upload_path = self._get_upload_file_path(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], file_name=file_name, extension=extension)
 
             # アップロードファイルに移動
+            self.file_move.base_file_move(old_path=discovery_file, new_path=upload_path)
 
 
         except Exception as e:
             self.logger.error(f"{self.__class__.__name__}処理中にエラーが発生: {e}")
 
-        self.logger.info(f'【{gss_row_data[self.const_gss_info["NAME"]]}】準備完了')
-        self.logger.info(f'image_path: {image_path}\nmovie_path: {movie_path}')
-        return image_path, movie_path
+
+
+# ----------------------------------------------------------------------------------
+
+
+    def _get_upload_file_path(self, account_dir_name: str, file_name: str, extension: str):
+        dir_name = self.const_download_kinds_info["UPLOAD_DIR_NAME"]
+        upload_file_path = self.path.result_ac_date_sub_file_path(account_dir_name=account_dir_name, sub_dir_name=dir_name, file_name=file_name, extension=extension)
+        return upload_file_path
+
+
 
 # ----------------------------------------------------------------------------------

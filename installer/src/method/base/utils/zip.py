@@ -47,6 +47,8 @@ class ZipOperation:
 
             self.logger.info(f'Zipファイルの解凍を行いました: {unique_unzip_file_dir}')
 
+            return unique_unzip_file_dir
+
         except Exception as e:
             self.logger.error(f'{self.__class__.__name__}: write_csv_joint: 処理中にエラーが発生{e}')
 

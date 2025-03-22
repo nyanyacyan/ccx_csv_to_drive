@@ -176,7 +176,7 @@ class SingleProcess:
             # ダウンロードFlow
 
 
-            # DriveアップロードFlow
+            # アップロードフォルダからすべてのファイルをDriveアップロード
 
 
             # 実施を成功欄に日付を書込をする

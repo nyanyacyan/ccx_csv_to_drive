@@ -111,6 +111,7 @@ class FollowerAnalysisElement(Enum):
         "ZIP_EXTENSION": ".zip",
         "CSV_FILE_HEAD_NAME": "フォロワーチャート",
         "CSV_EXTENSION": ".csv",
+        "UPLOAD_DIR_NAME": "uploads_to_google_drive",
 
         "FOLLOWER_ANALYSIS_BY": "",
         "FOLLOWER_ANALYSIS_VOL": "//a[contains(text(), 'フォロワー分析')]",

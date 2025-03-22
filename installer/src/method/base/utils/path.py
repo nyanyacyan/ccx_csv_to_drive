@@ -349,6 +349,20 @@ class BaseToPath:
         return FilePath
 
     # ----------------------------------------------------------------------------------
+    # Result > account_name > date > SubDir > file
+
+    def result_ac_date_sub_path(self, account_dir_name: str, sub_dir_name: str, file_name: str, extension: str):
+        result_outputPath = self.getResultOutputPath()
+        dirPath = result_outputPath / account_dir_name / self.currentDate / sub_dir_name
+        file = file_name + extension
+        file_path = dirPath / file
+        self.logger.warning(f"file_path: {file_path}")
+        self.logger.debug(f"file_pathの型: {type(file_path)}")
+        self.isDirExists(path=dirPath)
+        self.logger.debug(f"file_path: {file_path}")
+        return file_path
+
+    # ----------------------------------------------------------------------------------
     # Result > SubDir > FileName0101.txt
 
     def getResultSubDirDateFilePath(

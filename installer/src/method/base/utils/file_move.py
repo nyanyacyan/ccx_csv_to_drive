@@ -29,8 +29,7 @@ class FileMove:
         # インスタンス
         self.path = BaseToPath()
         self.currentDate = datetime.now().strftime("%y%m%d_%H%M%S")
-
-    # ----------------------------------------------------------------------------------
+    ####################################################################################
     # 結合して書き込む
 
     def move_csv_dl_to_outputDir(self, sub_dir_name: str, file_name_head: str, extension: str):
@@ -57,7 +56,20 @@ class FileMove:
         except Exception as e:
             self.logger.error(f'{self.__class__.__name__}: write_csv_joint: 処理中にエラーが発生{e}')
 
-    # ----------------------------------------------------------------------------------
+    ####################################################################################
+    # ファイルの基本の移動
+
+    def base_file_move(self, old_path: str, new_path: str):
+        try:
+            self.logger.debug(f'\nold_path: {old_path}\nnew_path: {new_path}')
+            shutil.move(old_path, new_path)
+            self.logger.info(f'ファイルの移動完了: {new_path}')
+            return new_path
+
+        except Exception as e:
+            self.logger.error(f'{self.__class__.__name__} ファイルの移動中にエラー発生: {e}')
+
+    ####################################################################################
     # home_path
 
     def _home_path(self):
