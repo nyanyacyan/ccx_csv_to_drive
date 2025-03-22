@@ -80,9 +80,8 @@ class FollowerDownloadFlow:
     ####################################################################################
     # 準備工程 スプシチェッカー > 写真のダウンロード > 動画のダウンロード
 
-    def downloads_process( self, gss_row_data: Dict, downloads_dir: str, err_datetime_cell: str, err_cmt_cell: str, ):
+    def downloads_process( self, gss_row_data: Dict, err_datetime_cell: str, err_cmt_cell: str, ):
         try:
-            pass
             # 対象の分析をクリック
             self.click_element.clickElement(analysis_value=self.const_download_kinds_info["analysis_value"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
@@ -94,7 +93,7 @@ class FollowerDownloadFlow:
             self.selenium._random_sleep()
 
             # Zipファイルの移動 → result_output → アカウント → date → *zip
-            new_zip_path = self.file_move.move_csv_dl_to_outputDir(sub_dir_name=gss_row_data[self.const_gss_info["NAME"]], file_name_head=self.const_download_kinds_info["ZIP_FILE_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
+            new_zip_path = self.file_move.move_csv_dl_to_outputDir(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], sub_dir_name=self.const_download_kinds_info["DOWNLOAD_DIR_NAME"], file_name_head=self.const_download_kinds_info["ZIP_FILE_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
 
             # zipの解凍
             unzip_folder_dir = self.zip.unzip_same_position(zipfile_path=new_zip_path)
@@ -110,11 +109,10 @@ class FollowerDownloadFlow:
             # アップロードファイルに移動
             self.file_move.base_file_move(old_path=discovery_file, new_path=upload_path)
 
+            self.logger.info(f'アカウント名: {gss_row_data[self.const_gss_info["NAME"]]} ダウンロード処理完了')
 
         except Exception as e:
             self.logger.error(f"{self.__class__.__name__}処理中にエラーが発生: {e}")
-
-
 
 # ----------------------------------------------------------------------------------
 
@@ -123,7 +121,5 @@ class FollowerDownloadFlow:
         dir_name = self.const_download_kinds_info["UPLOAD_DIR_NAME"]
         upload_file_path = self.path.result_ac_date_sub_file_path(account_dir_name=account_dir_name, sub_dir_name=dir_name, file_name=file_name, extension=extension)
         return upload_file_path
-
-
 
 # ----------------------------------------------------------------------------------

@@ -32,7 +32,7 @@ class FileMove:
     ####################################################################################
     # 結合して書き込む
 
-    def move_csv_dl_to_outputDir(self, sub_dir_name: str, file_name_head: str, extension: str):
+    def move_csv_dl_to_outputDir(self, account_dir_name: str, sub_dir_name: str, file_name_head: str, extension: str):
         try:
             downloads_path = Path(self._downloads_path())
 
@@ -48,7 +48,7 @@ class FileMove:
 
             old_path = matching_files[0]
             self.logger.debug(f'old_path: {old_path}\n old_path type: {type(old_path)}\nexists: {old_path.exists()}')
-            new_path = self._result_dir_path(sub_dir_name=sub_dir_name, file_name=old_path.stem, extension=extension)
+            new_path = self._result_dir_path(account_dir_name=account_dir_name, sub_dir_name=sub_dir_name, file_name=old_path.stem, extension=extension)
             self.logger.debug(f'new_path: {new_path}')
             shutil.move(old_path, new_path)
             return new_path
@@ -87,5 +87,5 @@ class FileMove:
     # ----------------------------------------------------------------------------------
     # 移動先のpath
 
-    def _result_dir_path(self, sub_dir_name: str, file_name: str, extension: str):
-        return self.path.result_sub_date_file_path(subDirName=sub_dir_name, fileName=file_name, extension=extension)
+    def _result_dir_path(self, account_dir_name: str, sub_dir_name: str, file_name: str, extension: str):
+        return self.path.result_ac_date_sub_path(account_dir_name=account_dir_name, subDirName=sub_dir_name, fileName=file_name, extension=extension)
