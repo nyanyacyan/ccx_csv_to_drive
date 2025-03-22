@@ -2,8 +2,8 @@
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 # import
-import os, shutil, glob
-from datetime import datetime, date
+import os, shutil
+from datetime import datetime
 from pathlib import Path
 
 
@@ -33,12 +33,11 @@ class FileMove:
     # ----------------------------------------------------------------------------------
     # 結合して書き込む
 
-    def move_csv_dl_to_inputDir(self, sub_dir_name: str, file_name_head: str, extension: str):
+    def move_csv_dl_to_outputDir(self, sub_dir_name: str, file_name_head: str, extension: str):
         try:
             downloads_path = Path(self._downloads_path())
-            today = date.today()
-            today_str = today.strftime("%Y%m%d")
-            search_file_name_word = f"{file_name_head}{today_str}*{extension}"
+
+            search_file_name_word = f"{file_name_head}*{extension}"
             self.logger.debug(f'search_file_name_word: {search_file_name_word}')
 
             matching_files = list(downloads_path.glob(search_file_name_word))
@@ -77,4 +76,4 @@ class FileMove:
     # 移動先のpath
 
     def _result_dir_path(self, sub_dir_name: str, file_name: str, extension: str):
-        return self.path.getResultSubDirFilePath(subDirName=sub_dir_name, fileName=file_name, extension=extension)
+        return self.path.result_sub_date_file_path(subDirName=sub_dir_name, fileName=file_name, extension=extension)

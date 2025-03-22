@@ -1,7 +1,7 @@
 # coding: utf-8
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 # export PYTHONPATH="/Users/nyanyacyan/Desktop/project_file/utage_csv_to_gss/installer/src"
-# export PYTHONPATH="/Users/nyanyacyan/Desktop/Project_file/utage_csv_to_drive/installer/src"
+# export PYTHONPATH="/Users/nyanyacyan/Desktop/Project_file/ccx_csv_to_drive/installer/src"
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 # import
@@ -73,31 +73,7 @@ class FlowProcess:
             # スプシにアクセス（Worksheet指定）
             df = self.gss_read._get_df_gss_url(gss_info=self.const_gss_info)
             df_filtered = df[df["チェック"] == "TRUE"]
-
             self.logger.debug(f'DataFrame: {df_filtered.head()}')
-
-            # 上記URLからWorksheetを取得
-            existing_titles = self.gss_read._get_all_worksheet(gss_info=self.const_gss_info)
-
-            # 取得シートのnameの全リスト出力
-            name_list = df_filtered[self.const_gss_info["NAME"]].tolist()
-            self.logger.debug(f'name_list: {name_list}')
-
-            # 現Worksheetに取得シートのnameに記載あるリストと突合
-            diff_name_list = [name for name in name_list if name not in existing_titles]
-            self.logger.info(f'作成するWorksheetのリスト: {diff_name_list}')
-
-            # なければ作成→ABCのcolumnは指定
-            if diff_name_list:
-                for name in diff_name_list:
-                    self.gss_write._create_worksheet_add_col(gss_info=self.const_gss_info, title_name=name)
-
-            else:
-                self.logger.info('追加するWorksheetはありません')
-
-            all_worksheet = existing_titles + diff_name_list
-
-            self.logger.info(f'全Worksheetリスト: {all_worksheet}')
 
             # 並列処理
             with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
@@ -185,7 +161,7 @@ class SingleProcess:
 
 
             # URLのアクセス→ID入力→Passの入力→ログイン
-            self.login.flow_login_id_input_url( login_info=login_info, login_url=gss_row_data[self.const_gss_info["URL"]], id_text=gss_row_data[self.const_gss_info["ID"]], pass_text=gss_row_data[self.const_gss_info["PASSWORD"]], gss_info=gss_info, err_datetime_cell=err_datetime_cell, err_cmt_cell=err_cmt_cell )
+            self.login.flow_login_id_input_url( login_info=login_info, login_url=login_info["LOGIN_URL"], id_text=gss_row_data[self.const_gss_info["ID"]], pass_text=gss_row_data[self.const_gss_info["PASSWORD"]], gss_info=gss_info, err_datetime_cell=err_datetime_cell, err_cmt_cell=err_cmt_cell )
 
             # フォロワー分析クリック → フォロワーチャート
             # ダウンロードFlow

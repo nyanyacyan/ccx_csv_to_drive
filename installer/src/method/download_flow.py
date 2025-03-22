@@ -22,6 +22,8 @@ from method.base.spreadsheet.spreadsheetWrite import GssWrite
 from method.base.spreadsheet.select_cell import GssSelectCell
 from method.base.spreadsheet.err_checker_write import GssCheckerErrWrite
 from method.base.utils.popup import Popup
+from method.base.utils.file_move import FileMove
+from method.base.utils.zip import ZipOperation
 
 # const
 from method.const_element import GssInfo, LoginInfo, ErrCommentInfo, PopUpComment
@@ -32,7 +34,7 @@ deco = Decorators()
 # **********************************************************************************
 # 一連の流れ
 
-class PrepareFlow:
+class FollowerDownloadFlow:
     def __init__(self, chrome: WebDriver):
         # logger
         self.getLogger = Logger()
@@ -56,6 +58,8 @@ class PrepareFlow:
         self.select_cell = GssSelectCell()
         self.gss_check_err_write = GssCheckerErrWrite()
         self.popup = Popup()
+        self.file_move = FileMove()
+        self.zip = ZipOperation()
 
         # const
         self.const_gss_info = GssInfo.LGRAM.value
@@ -70,16 +74,24 @@ class PrepareFlow:
     ####################################################################################
     # 準備工程 スプシチェッカー > 写真のダウンロード > 動画のダウンロード
 
-    def prepare_process( self, gss_row_data: Dict, gss_info: Dict, err_datetime_cell: str, err_cmt_cell: str, ):
+    def downloads_process( self, gss_row_data: Dict, downloads_const_dict: Dict, downloads_dir: str, err_datetime_cell: str, err_cmt_cell: str, ):
         try:
             pass
             # 対象の分析をクリック
+            self.click_element.clickElement(analysis_value=downloads_const_dict["analysis_value"])
+            self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
+            self.selenium._random_sleep()
 
             # 一括ダウンロードをクリック
+            self.click_element.clickElement(analysis_value=downloads_const_dict["analysis_value"])
+            self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
+            self.selenium._random_sleep()
 
-            # Zipファイルの移動
+            # Zipファイルの移動 → result_output → アカウント → date → *zip
+            new_zip_path = self.file_move.move_csv_dl_to_outputDir(sub_dir_name=gss_row_data[self.const_gss_info["NAME"]], file_name_head=self.const_element["ZIP_FILE_NAME"], extension=self.const_element["ZIP_EXTENSION"])
 
             # zipの解凍
+            self.zip.unzip_same_position(zipfile_path=new_zip_path)
 
             # 対象ファイルのPathを取得
 

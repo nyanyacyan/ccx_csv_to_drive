@@ -335,6 +335,20 @@ class BaseToPath:
         return FilePath
 
     # ----------------------------------------------------------------------------------
+    # Result > SubDir > date > file
+
+    def result_sub_date_file_path(self, subDirName: str, fileName: str, extension: str):
+        resultOutputPath = self.getResultOutputPath()
+        dirPath = resultOutputPath / subDirName / self.currentDate
+        file = fileName + extension
+        FilePath = dirPath / file
+        self.logger.warning(f"FilePath: {FilePath}")
+        self.logger.debug(f"FilePathの型: {type(FilePath)}")
+        self.isDirExists(path=dirPath)
+        self.logger.debug(f"FilePath: {FilePath}")
+        return FilePath
+
+    # ----------------------------------------------------------------------------------
     # Result > SubDir > FileName0101.txt
 
     def getResultSubDirDateFilePath(
@@ -392,6 +406,21 @@ class BaseToPath:
         dbFilePath = db_dir_path / f"{db_file_name}{self.currentDate}{extension}"
         self.logger.debug(f"dbFilePath: {dbFilePath}")
         return dbFilePath
+
+    # ----------------------------------------------------------------------------------
+    # resultOutput > 0101 > file_name
+
+    def writeFileDateNamePath(self, extension: str, subDirName: str):
+        resultOutputPath = self.getResultOutputPath()
+        fileFullPath = (
+            resultOutputPath
+            / subDirName
+            / self.currentDate
+            / f"{self.currentDate}{extension}"
+        )
+        self.isDirExists(path=fileFullPath)
+        self.logger.debug(f"fileFullPath: {fileFullPath}")
+        return fileFullPath
 
     # ----------------------------------------------------------------------------------
     # resultOutput > 0101 > 0101.txt

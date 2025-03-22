@@ -19,7 +19,7 @@ load_dotenv()
 
 class GssInfo(Enum):
 
-    UTAGE = {
+    CCX = {
         "JSON_KEY_NAME": "sns-auto-430920-08274ad68b41.json",
         "SHEET_URL": "https://docs.google.com/spreadsheets/d/1G8ME4Oy7H1cEjN5qKIYf9SBx25c9DxonnvFv8tQfkGM/edit?gid=675546558#gid=675546558",
         "WORKSHEET_NAME": "アカウント",
@@ -27,12 +27,11 @@ class GssInfo(Enum):
         # column名
         "URL": "URL",
         "CHECK": "チェック",
-        "NAME": "Name",
+        "NAME": "ユーザー名",
         "ID": "ID",
         "PASSWORD": "Password",
 
-        "ADD_COL": ["LINE友だちID", "LINE登録名", "登録日"],
-        "POST_COMPLETE_DATE": "投稿完了日",
+        "POST_COMPLETE_DATE": "最新実施日時",
         "ERROR_DATETIME": "エラー日時",
         "ERROR_COMMENT": "エラー理由",
 
@@ -52,15 +51,15 @@ class GssInfo(Enum):
 
 class LoginInfo(Enum):
 
-    UTAGE = {
+    CCX = {
         "LOGIN_URL": "https://social.ccxcloud.io/login",
         "HOME_URL": "",
-        "ID_BY": "xpath",
-        "ID_VALUE": "//input[@placeholder='メールアドレス']",
-        "PASS_BY": "xpath",
-        "PASS_VALUE": "//input[@placeholder='パスワード']",
+        "ID_BY": "id",
+        "ID_VALUE": "username",
+        "PASS_BY": "id",
+        "PASS_VALUE": "password",
         "BTN_BY": "xpath",
-        "BTN_VALUE": "//button[@type='submit' and contains(@class, 'btn-info')]",
+        "BTN_VALUE": "//button[contains(text(), 'ログイン')]",
         "LOGIN_AFTER_ELEMENT_BY": "xpath",
         "LOGIN_AFTER_ELEMENT_VALUE": "//button[@type='submit' and contains(text(), '絞り込む')]",
         "": "",
@@ -73,30 +72,11 @@ class LoginInfo(Enum):
 
 class ErrCommentInfo(Enum):
 
-    UTAGE = {
-        # 取得できてない時のコメント
-        "ERR_GSS_ID": "[ID]",
-        "ERR_GSS_PASS": "[Password]",
-        "ERR_GSS_RESERVE_DAY": "[投稿予約日]",
-        "ERR_GSS_RESERVE_TIME": "[投稿予約時間]",
-        "ERR_GSS_REEL_URL": "[リールURL]",
-        "ERR_GSS_THUMBNAIL_URL": "[サムネイルURL]",
-        "ERR_GSS_FIRST_TYPE": "[1通目_タイプ]",
-        "ERR_GSS_THIRD_TIMING": "[3通目_タイミング]",
-        "ERR_GSS_THIRD_TEXT": "[3通目_テキスト_テキスト]",
+    CCX = {
 
         # POPUP_TITLE
         "POPUP_TITLE_SHEET_INPUT_ERR": "スプレッドシートをご確認ください。",
         "POPUP_TITLE_FACEBOOK_LOGIN_ERR": "ログインが必要です",
-        "POPUP_COMMENT_FACEBOOK_LOGIN_ERR": "Facebookのログインが必要になります。",
-        "": "",
-        "": "",
-        "": "",
-        "": "",
-        # 正しくダウンロードできなかった時のコメント
-        "GET_PHOTO_ERR": "写真のダウンロードに失敗",
-        "GET_MOVIE_ERR": "動画のダウンロードに失敗",
-        "": "",
         "": "",
         "": "",
         "": "",
@@ -113,7 +93,7 @@ class ErrCommentInfo(Enum):
 
 
 class PopUpComment(Enum):
-    UTAGE = {
+    CCX = {
         "ALL_COMPLETE_TITLE": "完了通知",
         "ALL_COMPLETE_COMMENT": "すべての処理が完了しました。エラー内容をご確認ください",
         "": "",
@@ -124,8 +104,113 @@ class PopUpComment(Enum):
 
 # ----------------------------------------------------------------------------------
 
+
+class FollowerAnalysisElement(Enum):
+    CCX = {
+        "ZIP_FILE_HEAD_NAME": "Instagramマイアカウント フォロワー分析",
+        "ZIP_EXTENSION": ".zip",
+        "CSV_FILE_HEAD_NAME": "フォロワーチャート",
+        "CSV_EXTENSION": ".csv",
+
+        "FOLLOWER_ANALYSIS_BY": "",
+        "FOLLOWER_ANALYSIS_VOL": "//a[contains(text(), 'フォロワー分析')]",
+        "BULK_DOWNLOAD_BTN_BY": "",
+        "BULK_DOWNLOAD_BTN_VOL": "//button[.//span[contains(text(), '一括DL')]]",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+
+    }
+
+
+# ----------------------------------------------------------------------------------
+
+
+class EngagementAnalysisElement(Enum):
+    CCX = {
+        "FOLLOWER_ANALYSIS_BY": "",
+        "FOLLOWER_ANALYSIS_VOL": "//a[contains(text(), 'フォロワー分析')]",
+        "BULK_DOWNLOAD_BTN_BY": "",
+        "BULK_DOWNLOAD_BTN_VOL": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+
+    }
+
+
+# ----------------------------------------------------------------------------------
+
+
+class PostAnalysisElement(Enum):
+    CCX = {
+        "FOLLOWER_ANALYSIS_BY": "",
+        "FOLLOWER_ANALYSIS_VOL": "//a[contains(text(), 'フォロワー分析')]",
+        "BULK_DOWNLOAD_BTN_BY": "",
+        "BULK_DOWNLOAD_BTN_VOL": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+
+    }
+
+
+# ----------------------------------------------------------------------------------
+
+
+class StoriesAnalysisElement(Enum):
+    CCX = {
+        "FOLLOWER_ANALYSIS_BY": "",
+        "FOLLOWER_ANALYSIS_VOL": "//a[contains(text(), 'フォロワー分析')]",
+        "BULK_DOWNLOAD_BTN_BY": "",
+        "BULK_DOWNLOAD_BTN_VOL": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+        "": "",
+
+    }
+
+
+# ----------------------------------------------------------------------------------
+
 class Element(Enum):
-    UTAGE = {
+    CCX = {
         "MATCH_RULES_BY": "",
         "MATCH_RULES_VOL": "//input[@id='has_condition2']",
         "MATCH_CHOICE_BY": "xpath",
