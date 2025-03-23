@@ -29,6 +29,9 @@ from method.base.utils.popup import Popup
 from method.base.selenium.click_element import ClickElement
 from method.base.utils.file_move import FileMove
 
+# Flow
+from method.download_flow import FollowerDownloadFlow, EngagementDownloadFlow, PostDownloadFlow, StoriesDownloadFlow
+
 # const
 from method.const_element import GssInfo, LoginInfo, ErrCommentInfo, PopUpComment, Element
 
@@ -53,7 +56,6 @@ class FlowProcess:
         self.select_cell = GssSelectCell()
         self.gss_check_err_write = GssCheckerErrWrite()
         self.popup = Popup()
-
 
         self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
 
@@ -159,22 +161,33 @@ class SingleProcess:
             self.click_element = ClickElement(chrome=self.chrome)
             self.file_move = FileMove()
 
-
             # URLのアクセス→ID入力→Passの入力→ログイン
             self.login.flow_login_id_input_url( login_info=login_info, login_url=login_info["LOGIN_URL"], id_text=gss_row_data[self.const_gss_info["ID"]], pass_text=gss_row_data[self.const_gss_info["PASSWORD"]], gss_info=gss_info, err_datetime_cell=err_datetime_cell, err_cmt_cell=err_cmt_cell )
 
             # フォロワー分析クリック → フォロワーチャート
             # ダウンロードFlow
+            follower_flow = PostDownloadFlow(chrome=self.chrome)
+            follower_upload_file = follower_flow.downloads_process(gss_row_data=gss_row_data, err_datetime_cell=err_datetime_cell, err_cmt_cell=err_cmt_cell)
+
 
             # エンゲージメント分析をクリック → エンゲージメントの推移、プロフィールインサイトチャート
             # ダウンロードFlow
+            engage_flow = EngagementDownloadFlow(chrome=self.chrome)
+            engage_upload_file_list = engage_flow.downloads_process(gss_row_data=gss_row_data, err_datetime_cell=err_datetime_cell, err_cmt_cell=err_cmt_cell)
 
             # 投稿一覧 → インサイト投稿一覧
             # ダウンロードFlow
+            post_flow = FollowerDownloadFlow(chrome=self.chrome)
+            post_upload_file = post_flow.downloads_process(gss_row_data=gss_row_data, err_datetime_cell=err_datetime_cell, err_cmt_cell=err_cmt_cell)
 
             # ストーリーズ分析をクリック → ストーリーズ投稿一覧
             # ダウンロードFlow
+            stories_flow = StoriesDownloadFlow(chrome=self.chrome)
+            stories_upload_file = stories_flow.downloads_process(gss_row_data=gss_row_data, err_datetime_cell=err_datetime_cell, err_cmt_cell=err_cmt_cell)
 
+            # upload_pathをリスト化
+            join_list = [item for x in [follower_upload_file, engage_upload_file_list, post_upload_file, stories_upload_file] for item in (x if isinstance(x, list) else [x])]
+            self.logger.info(f'join_list: {join_list}')
 
             # アップロードフォルダからすべてのファイルをDriveアップロード
 

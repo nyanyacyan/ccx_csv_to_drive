@@ -88,7 +88,7 @@ class FollowerDownloadFlow:
             self.selenium._random_sleep()
 
             # 一括ダウンロードをクリック
-            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["ANALYSIS_VOL"])
+            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["BULK_DOWNLOAD_BTN_VOL"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
             self.selenium._random_sleep()
 
@@ -108,6 +108,8 @@ class FollowerDownloadFlow:
 
             # アップロードファイルに移動
             self.file_move.base_file_move(old_path=discovery_file, new_path=upload_path)
+
+            return upload_path
 
             self.logger.info(f'アカウント名: {gss_row_data[self.const_gss_info["NAME"]]} ダウンロード処理完了')
 
@@ -181,28 +183,33 @@ class EngagementDownloadFlow:
     def downloads_process( self, gss_row_data: Dict, err_datetime_cell: str, err_cmt_cell: str, ):
         try:
             # 対象の分析をクリック
-            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["analysis_value"])
+            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["ANALYSIS_VOL"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
             self.selenium._random_sleep()
 
             # 一括ダウンロードをクリック
-            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["analysis_value"])
+            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["BULK_DOWNLOAD_BTN_VOL"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
             self.selenium._random_sleep()
 
-            file_name_heads = []
-            file_name_heads.append(self.const_download_kinds_info["ZIP_FILE_NAME_FIRST"])
-            file_name_heads.append(self.const_download_kinds_info["ZIP_FILE_NAME_SECOND"])
-
             # Zipファイルの移動 → result_output → アカウント → date → *zip
-            new_zip_path_list = self.file_move.move_csv_dl_to_outputDir_list(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], sub_dir_name=self.const_download_kinds_info["DOWNLOAD_DIR_NAME"], file_name_heads=file_name_heads, extension=self.const_download_kinds_info["ZIP_EXTENSION"])
+            new_zip_path = self.file_move.move_csv_dl_to_outputDir(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], sub_dir_name=self.const_download_kinds_info["DOWNLOAD_DIR_NAME"], file_name_head=self.const_download_kinds_info["ZIP_FILE_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
 
-            for new_zip_path in new_zip_path_list:
-                # zipの解凍
-                unzip_folder_dir = self.zip.unzip_same_position(zipfile_path=new_zip_path)
+            # zipの解凍
+            unzip_folder_dir = self.zip.unzip_same_position(zipfile_path=new_zip_path)
 
-                # 対象ファイルのPathを取得
-                discovery_file = self.search_file_name_head.get_search_file_name_head(search_folder_path=unzip_folder_dir, file_name_head=self.const_download_kinds_info["CSV_FILE_HEAD_NAME"], extension=self.const_download_kinds_info["CSV_EXTENSION"])
+            discovery_files = []
+
+            # 対象ファイルのPathを取得
+            discovery_file_first = self.search_file_name_head.get_search_file_name_head(search_folder_path=unzip_folder_dir, file_name_head=self.const_download_kinds_info["CSV_FILE_HEAD_FIRST_NAME"], extension=self.const_download_kinds_info["CSV_EXTENSION"])
+            discovery_files.append(discovery_file_first)
+
+            discovery_file_second = self.search_file_name_head.get_search_file_name_head(search_folder_path=unzip_folder_dir, file_name_head=self.const_download_kinds_info["CSV_FILE_HEAD_SECOND_NAME"], extension=self.const_download_kinds_info["CSV_EXTENSION"])
+            discovery_files.append(discovery_file_second)
+
+            upload_path_list = []
+
+            for discovery_file in discovery_files:
 
                 # アップロード先のPathを取得
                 base_dir = os.path.dirname(discovery_file)  # ファイルまでのPathを取得
@@ -211,6 +218,10 @@ class EngagementDownloadFlow:
 
                 # アップロードファイルに移動
                 self.file_move.base_file_move(old_path=discovery_file, new_path=upload_path)
+                upload_path_list.append(upload_path)
+
+            self.logger.debug(f'upload_path_list: {upload_path_list}')
+            return upload_path_list
 
             self.logger.info(f'アカウント名: {gss_row_data[self.const_gss_info["NAME"]]} ダウンロード処理完了')
 
@@ -284,12 +295,12 @@ class PostDownloadFlow:
     def downloads_process( self, gss_row_data: Dict, err_datetime_cell: str, err_cmt_cell: str, ):
         try:
             # 対象の分析をクリック
-            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["analysis_value"])
+            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["ANALYSIS_VOL"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
             self.selenium._random_sleep()
 
             # 一括ダウンロードをクリック
-            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["analysis_value"])
+            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["BULK_DOWNLOAD_BTN_VOL"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
             self.selenium._random_sleep()
 
@@ -382,12 +393,12 @@ class StoriesDownloadFlow:
     def downloads_process( self, gss_row_data: Dict, err_datetime_cell: str, err_cmt_cell: str, ):
         try:
             # 対象の分析をクリック
-            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["analysis_value"])
+            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["ANALYSIS_VOL"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
             self.selenium._random_sleep()
 
             # 一括ダウンロードをクリック
-            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["analysis_value"])
+            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["BULK_DOWNLOAD_BTN_VOL"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
             self.selenium._random_sleep()
 
