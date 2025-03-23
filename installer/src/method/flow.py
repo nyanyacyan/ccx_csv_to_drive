@@ -222,7 +222,6 @@ class SingleProcess:
 
         finally:
             # self._delete_file(csv_path)  # CSVファイルを消去
-
             # ✅ Chrome を終了
             self.chrome.quit()
 

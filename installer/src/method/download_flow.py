@@ -113,10 +113,9 @@ class FollowerDownloadFlow:
 
             # アップロードファイルに移動
             self.file_move.base_file_move(old_path=discovery_file, new_path=upload_path)
+            self.logger.info(f'アカウント名: {gss_row_data[self.const_gss_info["NAME"]]} ダウンロード処理完了')
 
             return upload_path
-
-            self.logger.info(f'アカウント名: {gss_row_data[self.const_gss_info["NAME"]]} ダウンロード処理完了')
 
         except Exception as e:
             error_comment = "フォロワーダウンロードflow処理中にエラーが発生"
@@ -129,6 +128,8 @@ class FollowerDownloadFlow:
             # エラーコメント
             self.gss_write.write_data_by_url(gss_info=self.const_gss_info, cell=err_cmt_cell, input_data=error_comment)
 
+        finally:
+            # Zipを削除
 
     # ----------------------------------------------------------------------------------
     # downloads path
