@@ -41,7 +41,7 @@ class GssInfo(Enum):
         "LINE_NAME": "LINE登録名",
         "SIGN_UP_DATE": "登録日",
 
-        "TYPE_PANEL": "パネル",
+        "DRIVE_PARENTS_URL": "パネル",
     }
 
 

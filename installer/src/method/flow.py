@@ -28,6 +28,7 @@ from method.base.selenium.loginWithId import SingleSiteIDLogin
 from method.base.utils.popup import Popup
 from method.base.selenium.click_element import ClickElement
 from method.base.utils.file_move import FileMove
+from method.base.selenium.google_drive_upload import GoogleDriveUpload
 
 # Flow
 from method.download_flow import FollowerDownloadFlow, EngagementDownloadFlow, PostDownloadFlow, StoriesDownloadFlow
@@ -155,6 +156,7 @@ class SingleProcess:
             self.gss_read = GetDataGSSAPI()
             self.gss_write = GssWrite()
             self.drive_download = GoogleDriveDownload()
+            self.drive_upload = GoogleDriveUpload()
             self.select_cell = GssSelectCell()
             self.gss_check_err_write = GssCheckerErrWrite()
             self.popup = Popup()
@@ -186,11 +188,12 @@ class SingleProcess:
             stories_upload_file = stories_flow.downloads_process(gss_row_data=gss_row_data, err_datetime_cell=err_datetime_cell, err_cmt_cell=err_cmt_cell)
 
             # upload_pathをリスト化
-            join_list = [item for x in [follower_upload_file, engage_upload_file_list, post_upload_file, stories_upload_file] for item in (x if isinstance(x, list) else [x])]
-            self.logger.info(f'join_list: {join_list}')
+            upload_path_list = [item for x in [follower_upload_file, engage_upload_file_list, post_upload_file, stories_upload_file] for item in (x if isinstance(x, list) else [x])]
+            self.logger.info(f'upload_path_list: {upload_path_list}')
 
             # アップロードフォルダからすべてのファイルをDriveアップロード
-
+            for path in upload_path_list:
+                self.drive_upload.upload_file_to_drive(parents_folder_url=self.const_gss_info["DRIVE_PARENTS_URL"]], file_path=path, gss_info=gss_info)
 
             # 実施を成功欄に日付を書込をする
             self.gss_write.write_data_by_url(gss_info, complete_cell, input_data=str(self.timestamp_two))
@@ -215,7 +218,7 @@ class SingleProcess:
             self.gss_write.write_data_by_url(gss_info=gss_info, cell=err_cmt_cell, input_data=timeout_comment)
 
         finally:
-            self._delete_file(csv_path)  # CSVファイルを消去
+            # self._delete_file(csv_path)  # CSVファイルを消去
 
             # ✅ Chrome を終了
             self.chrome.quit()

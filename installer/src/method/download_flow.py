@@ -25,6 +25,7 @@ from method.base.spreadsheet.select_cell import GssSelectCell
 from method.base.spreadsheet.err_checker_write import GssCheckerErrWrite
 from method.base.utils.popup import Popup
 from method.base.utils.file_move import FileMove
+from method.base.utils.file_delete import DownloadFileDelete
 from method.base.utils.zip import ZipOperation
 from method.base.utils.search_file_name_head import SearchFileNameHead
 
@@ -65,6 +66,7 @@ class FollowerDownloadFlow:
         self.file_move = FileMove()
         self.zip = ZipOperation()
         self.search_file_name_head = SearchFileNameHead()
+        self.downloads_file_delete = DownloadFileDelete()
 
         # const
         self.const_gss_info = GssInfo.CCX.value
@@ -82,6 +84,9 @@ class FollowerDownloadFlow:
 
     def downloads_process( self, gss_row_data: Dict, err_datetime_cell: str, err_cmt_cell: str, ):
         try:
+            # ダウンロードフォルダに既存でないかチェック→あったら削除
+            self.downloads_file_delete.delete_in_download_folder(file_name_head=self.const_download_kinds_info["ZIP_FILE_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
+
             # 対象の分析をクリック
             self.click_element.clickElement(analysis_value=self.const_download_kinds_info["ANALYSIS_VOL"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
@@ -124,6 +129,15 @@ class FollowerDownloadFlow:
             # エラーコメント
             self.gss_write.write_data_by_url(gss_info=self.const_gss_info, cell=err_cmt_cell, input_data=error_comment)
 
+
+    # ----------------------------------------------------------------------------------
+    # downloads path
+
+    def _downloads_path(self):
+        home = self._home_path()
+        downloads_path = os.path.join(home, "Downloads")
+        self.logger.debug(f'downloads_path: {downloads_path}')
+        return downloads_path
 
     # ----------------------------------------------------------------------------------
     # アップロード用のpath
@@ -182,6 +196,9 @@ class EngagementDownloadFlow:
 
     def downloads_process( self, gss_row_data: Dict, err_datetime_cell: str, err_cmt_cell: str, ):
         try:
+            # ダウンロードフォルダに既存でないかチェック→あったら削除
+            self.downloads_file_delete.delete_in_download_folder(file_name_head=self.const_download_kinds_info["ZIP_FILE_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
+
             # 対象の分析をクリック
             self.click_element.clickElement(analysis_value=self.const_download_kinds_info["ANALYSIS_VOL"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
@@ -277,6 +294,7 @@ class PostDownloadFlow:
         self.file_move = FileMove()
         self.zip = ZipOperation()
         self.search_file_name_head = SearchFileNameHead()
+        self.downloads_file_delete = DownloadFileDelete()
 
         # const
         self.const_gss_info = GssInfo.CCX.value
@@ -294,6 +312,9 @@ class PostDownloadFlow:
 
     def downloads_process( self, gss_row_data: Dict, err_datetime_cell: str, err_cmt_cell: str, ):
         try:
+            # ダウンロードフォルダに既存でないかチェック→あったら削除
+            self.downloads_file_delete.delete_in_download_folder(file_name_head=self.const_download_kinds_info["ZIP_FILE_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
+
             # 対象の分析をクリック
             self.click_element.clickElement(analysis_value=self.const_download_kinds_info["ANALYSIS_VOL"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
@@ -375,6 +396,7 @@ class StoriesDownloadFlow:
         self.file_move = FileMove()
         self.zip = ZipOperation()
         self.search_file_name_head = SearchFileNameHead()
+        self.downloads_file_delete = DownloadFileDelete()
 
         # const
         self.const_gss_info = GssInfo.CCX.value
@@ -392,6 +414,9 @@ class StoriesDownloadFlow:
 
     def downloads_process( self, gss_row_data: Dict, err_datetime_cell: str, err_cmt_cell: str, ):
         try:
+            # ダウンロードフォルダに既存でないかチェック→あったら削除
+            self.downloads_file_delete.delete_in_download_folder(file_name_head=self.const_download_kinds_info["ZIP_FILE_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
+
             # 対象の分析をクリック
             self.click_element.clickElement(analysis_value=self.const_download_kinds_info["ANALYSIS_VOL"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
