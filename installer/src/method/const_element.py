@@ -114,23 +114,12 @@ class FollowerAnalysisElement(Enum):
         "DOWNLOAD_DIR_NAME": "downloads",
         "UPLOAD_DIR_NAME": "uploads_to_google_drive",
 
-        "FOLLOWER_ANALYSIS_BY": "",
-        "FOLLOWER_ANALYSIS_VOL": "//a[contains(text(), 'フォロワー分析')]",
+        "ANALYSIS_BY": "",
+        "ANALYSIS_VOL": "//a[contains(text(), 'フォロワー分析')]",
         "BULK_DOWNLOAD_BTN_BY": "",
         "BULK_DOWNLOAD_BTN_VOL": "//button[.//span[contains(text(), '一括DL')]]",
         "": "",
         "": "",
-        "": "",
-        "": "",
-        "": "",
-        "": "",
-        "": "",
-        "": "",
-        "": "",
-        "": "",
-        "": "",
-        "": "",
-
     }
 
 
@@ -139,23 +128,19 @@ class FollowerAnalysisElement(Enum):
 
 class EngagementAnalysisElement(Enum):
     CCX = {
-        "FOLLOWER_ANALYSIS_BY": "",
-        "FOLLOWER_ANALYSIS_VOL": "//a[contains(text(), 'フォロワー分析')]",
-        "BULK_DOWNLOAD_BTN_BY": "",
-        "BULK_DOWNLOAD_BTN_VOL": "",
-        "": "",
-        "": "",
-        "": "",
-        "": "",
-        "": "",
-        "": "",
-        "": "",
-        "": "",
-        "": "",
-        "": "",
-        "": "",
-        "": "",
+        "ZIP_FILE_HEAD_NAME": "Instagramマイアカウント フォロワー分析",
+        "ZIP_EXTENSION": ".zip",
+        "CSV_FILE_HEAD_NAME": "フォロワーチャート",
+        "CSV_EXTENSION": ".csv",
+        "DOWNLOAD_DIR_NAME": "downloads",
+        "UPLOAD_DIR_NAME": "uploads_to_google_drive",
 
+        "ANALYSIS_BY": "",
+        "ANALYSIS_VOL": "//a[contains(text(), 'フォロワー分析')]",
+        "BULK_DOWNLOAD_BTN_BY": "",
+        "BULK_DOWNLOAD_BTN_VOL": "//button[.//span[contains(text(), '一括DL')]]",
+        "": "",
+        "": "",
     }
 
 
