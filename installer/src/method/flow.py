@@ -192,8 +192,11 @@ class SingleProcess:
             self.logger.info(f'upload_path_list: {upload_path_list}')
 
             # アップロードフォルダからすべてのファイルをDriveアップロード
-            for path in upload_path_list:
-                self.drive_upload.upload_file_to_drive(parents_folder_url=self.const_gss_info["DRIVE_PARENTS_URL"]], file_path=path, gss_info=gss_info)
+            count = 0
+            for upload_path in upload_path_list:
+                self.drive_upload.upload_file_to_drive(parents_folder_url=self.const_gss_info["DRIVE_PARENTS_URL"], file_path=upload_path, gss_info=gss_info)
+                count += 1
+                self.logger.info(f'{count} つ目のファイルアップロード完了 {upload_path}')
 
             # 実施を成功欄に日付を書込をする
             self.gss_write.write_data_by_url(gss_info, complete_cell, input_data=str(self.timestamp_two))
