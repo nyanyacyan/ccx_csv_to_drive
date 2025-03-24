@@ -61,7 +61,7 @@ class LoginInfo(Enum):
         "BTN_BY": "xpath",
         "BTN_VALUE": "//button[contains(text(), 'ログイン')]",
         "LOGIN_AFTER_ELEMENT_BY": "xpath",
-        "LOGIN_AFTER_ELEMENT_VALUE": "//button[@type='submit' and contains(text(), '絞り込む')]",
+        "LOGIN_AFTER_ELEMENT_VALUE": "//li[contains(@class, 'sidebar-item') and .//a[contains(text(), 'フォロワー分析')]]",
         "": "",
         "": "",
     }

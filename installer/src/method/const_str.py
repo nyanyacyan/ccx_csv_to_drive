@@ -96,9 +96,8 @@ class StatusName(Enum):
 
 
 class SiteName(Enum):
-    LGRAM = "LGRAM"
-    MA_CLUB = "MA_CLUB"
-    RMT_CLUB = "RMT_CLUB"
+    CCX = "CCX"
+
 
 
 # ----------------------------------------------------------------------------------

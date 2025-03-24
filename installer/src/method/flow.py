@@ -1,6 +1,6 @@
 # coding: utf-8
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-# export PYTHONPATH="/Users/nyanyacyan/Desktop/project_file/utage_csv_to_gss/installer/src"
+# export PYTHONPATH="/Users/nyanyacyan/Desktop/project_file/ccx_csv_to_drive/installer/src"
 # export PYTHONPATH="/Users/nyanyacyan/Desktop/Project_file/ccx_csv_to_drive/installer/src"
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -61,10 +61,10 @@ class FlowProcess:
         self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
 
         # const
-        self.const_gss_info = GssInfo.UTAGE.value
-        self.const_login_info = LoginInfo.UTAGE.value
-        self.const_err_cmt_dict = ErrCommentInfo.UTAGE.value
-        self.popup_cmt = PopUpComment.UTAGE.value
+        self.const_gss_info = GssInfo.CCX.value
+        self.const_login_info = LoginInfo.CCX.value
+        self.const_err_cmt_dict = ErrCommentInfo.CCX.value
+        self.popup_cmt = PopUpComment.CCX.value
 
 
     ####################################################################################
@@ -130,11 +130,11 @@ class SingleProcess:
         self.date_only_stamp = self.timestamp.date().strftime("%m月%d日")
 
         # const
-        self.const_gss_info = GssInfo.UTAGE.value
-        self.const_login_info = LoginInfo.UTAGE.value
-        self.const_element = Element.UTAGE.value
-        self.const_err_cmt_dict = ErrCommentInfo.UTAGE.value
-        self.popup_cmt = PopUpComment.UTAGE.value
+        self.const_gss_info = GssInfo.CCX.value
+        self.const_login_info = LoginInfo.CCX.value
+        self.const_element = Element.CCX.value
+        self.const_err_cmt_dict = ErrCommentInfo.CCX.value
+        self.popup_cmt = PopUpComment.CCX.value
 
 # **********************************************************************************
     # ----------------------------------------------------------------------------------
@@ -168,7 +168,7 @@ class SingleProcess:
 
             # フォロワー分析クリック → フォロワーチャート
             # ダウンロードFlow
-            follower_flow = PostDownloadFlow(chrome=self.chrome)
+            follower_flow = FollowerDownloadFlow(chrome=self.chrome)
             follower_upload_file = follower_flow.downloads_process(gss_row_data=gss_row_data, err_datetime_cell=err_datetime_cell, err_cmt_cell=err_cmt_cell)
 
 
@@ -179,7 +179,7 @@ class SingleProcess:
 
             # 投稿一覧 → インサイト投稿一覧
             # ダウンロードFlow
-            post_flow = FollowerDownloadFlow(chrome=self.chrome)
+            post_flow = PostDownloadFlow(chrome=self.chrome)
             post_upload_file = post_flow.downloads_process(gss_row_data=gss_row_data, err_datetime_cell=err_datetime_cell, err_cmt_cell=err_cmt_cell)
 
             # ストーリーズ分析をクリック → ストーリーズ投稿一覧
@@ -221,7 +221,12 @@ class SingleProcess:
             self.gss_write.write_data_by_url(gss_info=gss_info, cell=err_cmt_cell, input_data=timeout_comment)
 
         finally:
-            # self._delete_file(csv_path)  # CSVファイルを消去
+            delete_count = 0
+            for upload_path in upload_path_list:
+                self._delete_file(upload_path)  # CSVファイルを消去
+                delete_count += 1
+                self.logger.info(f'{delete_count} つ目のCSVファイルの削除を実施')
+
             # ✅ Chrome を終了
             self.chrome.quit()
 

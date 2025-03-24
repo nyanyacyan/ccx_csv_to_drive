@@ -17,6 +17,7 @@ from method.base.selenium.loginWithId import SingleSiteIDLogin
 from method.base.selenium.seleniumBase import SeleniumBasicOperations
 from method.base.spreadsheet.spreadsheetRead import GetDataGSSAPI
 from method.base.selenium.get_element import GetElement
+from method.base.selenium.click_element import ClickElement
 from method.base.decorators.decorators import Decorators
 from method.base.utils.time_manager import TimeManager
 from method.base.selenium.google_drive_download import GoogleDriveDownload
@@ -30,7 +31,7 @@ from method.base.utils.zip import ZipOperation
 from method.base.utils.search_file_name_head import SearchFileNameHead
 
 # const
-from method.const_element import GssInfo, LoginInfo, ErrCommentInfo, PopUpComment, FollowerAnalysisElement, EngagementAnalysisElement
+from method.const_element import GssInfo, LoginInfo, ErrCommentInfo, PopUpComment, FollowerAnalysisElement, EngagementAnalysisElement, PostAnalysisElement, StoriesAnalysisElement
 
 deco = Decorators()
 
@@ -48,12 +49,13 @@ class FollowerDownloadFlow:
         self.chrome = chrome
 
         # 必要info
-        self.gss_info = GssInfo.LGRAM.value
+        self.gss_info = GssInfo.CCX.value
 
         # インスタンス
         self.login = SingleSiteIDLogin(chrome=self.chrome)
         self.random_sleep = SeleniumBasicOperations(chrome=self.chrome)
         self.get_element = GetElement(chrome=self.chrome)
+        self.click_element = ClickElement(chrome=self.chrome)
         self.time_manager = TimeManager()
         self.selenium = SeleniumBasicOperations(chrome=self.chrome)
         self.gss_read = GetDataGSSAPI()
@@ -85,20 +87,20 @@ class FollowerDownloadFlow:
     def downloads_process( self, gss_row_data: Dict, err_datetime_cell: str, err_cmt_cell: str, ):
         try:
             # ダウンロードフォルダに既存でないかチェック→あったら削除
-            self.downloads_file_delete.delete_in_download_folder(file_name_head=self.const_download_kinds_info["ZIP_FILE_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
+            self.downloads_file_delete.delete_in_download_folder(file_name_head=self.const_download_kinds_info["ZIP_FILE_HEAD_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
 
             # 対象の分析をクリック
-            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["ANALYSIS_VOL"])
+            self.click_element.clickElement(value=self.const_download_kinds_info["ANALYSIS_VOL"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
             self.selenium._random_sleep()
 
             # 一括ダウンロードをクリック
-            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["BULK_DOWNLOAD_BTN_VOL"])
+            self.click_element.clickElement(value=self.const_download_kinds_info["BULK_DOWNLOAD_BTN_VOL"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
             self.selenium._random_sleep()
 
             # Zipファイルの移動 → result_output → アカウント → date → *zip
-            new_zip_path = self.file_move.move_csv_dl_to_outputDir(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], sub_dir_name=self.const_download_kinds_info["DOWNLOAD_DIR_NAME"], file_name_head=self.const_download_kinds_info["ZIP_FILE_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
+            new_zip_path = self.file_move.move_csv_dl_to_outputDir(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], sub_dir_name=self.const_download_kinds_info["DOWNLOAD_DIR_NAME"], file_name_head=self.const_download_kinds_info["ZIP_FILE_HEAD_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
 
             # zipの解凍
             unzip_folder_dir = self.zip.unzip_same_position(zipfile_path=new_zip_path)
@@ -115,7 +117,6 @@ class FollowerDownloadFlow:
             self.file_move.base_file_move(old_path=discovery_file, new_path=upload_path)
             self.logger.info(f'アカウント名: {gss_row_data[self.const_gss_info["NAME"]]} ダウンロード処理完了')
 
-            return upload_path
 
         except Exception as e:
             error_comment = "フォロワーダウンロードflow処理中にエラーが発生"
@@ -130,6 +131,7 @@ class FollowerDownloadFlow:
 
         finally:
             # Zipを削除
+            self._delete_file(file_path=new_zip_path)
 
     # ----------------------------------------------------------------------------------
     # downloads path
@@ -149,6 +151,17 @@ class FollowerDownloadFlow:
         return upload_file_path
 
     # ----------------------------------------------------------------------------------
+    # 不必要なファイルを削除
+
+    def _delete_file(self, file_path: str):
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            self.logger.info(f'指定のファイルの削除を実施: {file_path}')
+
+        else:
+            self.logger.error(f'{self.__class__.__name__} ファイルが存在しません: {file_path}')
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # **********************************************************************************
 # 一連の流れ
 
@@ -162,12 +175,13 @@ class EngagementDownloadFlow:
         self.chrome = chrome
 
         # 必要info
-        self.gss_info = GssInfo.LGRAM.value
+        self.gss_info = GssInfo.CCX.value
 
         # インスタンス
         self.login = SingleSiteIDLogin(chrome=self.chrome)
         self.random_sleep = SeleniumBasicOperations(chrome=self.chrome)
         self.get_element = GetElement(chrome=self.chrome)
+        self.click_element = ClickElement(chrome=self.chrome)
         self.time_manager = TimeManager()
         self.selenium = SeleniumBasicOperations(chrome=self.chrome)
         self.gss_read = GetDataGSSAPI()
@@ -180,6 +194,7 @@ class EngagementDownloadFlow:
         self.file_move = FileMove()
         self.zip = ZipOperation()
         self.search_file_name_head = SearchFileNameHead()
+        self.downloads_file_delete = DownloadFileDelete()
 
         # const
         self.const_gss_info = GssInfo.CCX.value
@@ -198,20 +213,20 @@ class EngagementDownloadFlow:
     def downloads_process( self, gss_row_data: Dict, err_datetime_cell: str, err_cmt_cell: str, ):
         try:
             # ダウンロードフォルダに既存でないかチェック→あったら削除
-            self.downloads_file_delete.delete_in_download_folder(file_name_head=self.const_download_kinds_info["ZIP_FILE_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
+            self.downloads_file_delete.delete_in_download_folder(file_name_head=self.const_download_kinds_info["ZIP_FILE_HEAD_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
 
             # 対象の分析をクリック
-            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["ANALYSIS_VOL"])
+            self.click_element.clickElement(value=self.const_download_kinds_info["ANALYSIS_VOL"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
             self.selenium._random_sleep()
 
             # 一括ダウンロードをクリック
-            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["BULK_DOWNLOAD_BTN_VOL"])
+            self.click_element.clickElement(value=self.const_download_kinds_info["BULK_DOWNLOAD_BTN_VOL"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
             self.selenium._random_sleep()
 
             # Zipファイルの移動 → result_output → アカウント → date → *zip
-            new_zip_path = self.file_move.move_csv_dl_to_outputDir(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], sub_dir_name=self.const_download_kinds_info["DOWNLOAD_DIR_NAME"], file_name_head=self.const_download_kinds_info["ZIP_FILE_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
+            new_zip_path = self.file_move.move_csv_dl_to_outputDir(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], sub_dir_name=self.const_download_kinds_info["DOWNLOAD_DIR_NAME"], file_name_head=self.const_download_kinds_info["ZIP_FILE_HEAD_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
 
             # zipの解凍
             unzip_folder_dir = self.zip.unzip_same_position(zipfile_path=new_zip_path)
@@ -277,12 +292,13 @@ class PostDownloadFlow:
         self.chrome = chrome
 
         # 必要info
-        self.gss_info = GssInfo.LGRAM.value
+        self.gss_info = GssInfo.CCX.value
 
         # インスタンス
         self.login = SingleSiteIDLogin(chrome=self.chrome)
         self.random_sleep = SeleniumBasicOperations(chrome=self.chrome)
         self.get_element = GetElement(chrome=self.chrome)
+        self.click_element = ClickElement(chrome=self.chrome)
         self.time_manager = TimeManager()
         self.selenium = SeleniumBasicOperations(chrome=self.chrome)
         self.gss_read = GetDataGSSAPI()
@@ -304,7 +320,7 @@ class PostDownloadFlow:
         self.popup_cmt = PopUpComment.CCX.value
 
         # downloads_const
-        self.const_download_kinds_info = EngagementAnalysisElement.CCX.value
+        self.const_download_kinds_info = PostAnalysisElement.CCX.value
 
         self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
 
@@ -314,15 +330,15 @@ class PostDownloadFlow:
     def downloads_process( self, gss_row_data: Dict, err_datetime_cell: str, err_cmt_cell: str, ):
         try:
             # ダウンロードフォルダに既存でないかチェック→あったら削除
-            self.downloads_file_delete.delete_in_download_folder(file_name_head=self.const_download_kinds_info["ZIP_FILE_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
+            self.downloads_file_delete.delete_in_download_folder(file_name_head=self.const_download_kinds_info["ZIP_FILE_HEAD_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
 
             # 対象の分析をクリック
-            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["ANALYSIS_VOL"])
+            self.click_element.clickElement(value=self.const_download_kinds_info["ANALYSIS_VOL"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
             self.selenium._random_sleep()
 
             # 一括ダウンロードをクリック
-            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["BULK_DOWNLOAD_BTN_VOL"])
+            self.click_element.clickElement(value=self.const_download_kinds_info["BULK_DOWNLOAD_BTN_VOL"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
             self.selenium._random_sleep()
 
@@ -379,12 +395,13 @@ class StoriesDownloadFlow:
         self.chrome = chrome
 
         # 必要info
-        self.gss_info = GssInfo.LGRAM.value
+        self.gss_info = GssInfo.CCX.value
 
         # インスタンス
         self.login = SingleSiteIDLogin(chrome=self.chrome)
         self.random_sleep = SeleniumBasicOperations(chrome=self.chrome)
         self.get_element = GetElement(chrome=self.chrome)
+        self.click_element = ClickElement(chrome=self.chrome)
         self.time_manager = TimeManager()
         self.selenium = SeleniumBasicOperations(chrome=self.chrome)
         self.gss_read = GetDataGSSAPI()
@@ -406,7 +423,7 @@ class StoriesDownloadFlow:
         self.popup_cmt = PopUpComment.CCX.value
 
         # downloads_const
-        self.const_download_kinds_info = EngagementAnalysisElement.CCX.value
+        self.const_download_kinds_info = StoriesAnalysisElement.CCX.value
 
         self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
 
@@ -416,15 +433,15 @@ class StoriesDownloadFlow:
     def downloads_process( self, gss_row_data: Dict, err_datetime_cell: str, err_cmt_cell: str, ):
         try:
             # ダウンロードフォルダに既存でないかチェック→あったら削除
-            self.downloads_file_delete.delete_in_download_folder(file_name_head=self.const_download_kinds_info["ZIP_FILE_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
+            self.downloads_file_delete.delete_in_download_folder(file_name_head=self.const_download_kinds_info["ZIP_FILE_HEAD_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
 
             # 対象の分析をクリック
-            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["ANALYSIS_VOL"])
+            self.click_element.clickElement(value=self.const_download_kinds_info["ANALYSIS_VOL"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
             self.selenium._random_sleep()
 
             # 一括ダウンロードをクリック
-            self.click_element.clickElement(analysis_value=self.const_download_kinds_info["BULK_DOWNLOAD_BTN_VOL"])
+            self.click_element.clickElement(value=self.const_download_kinds_info["BULK_DOWNLOAD_BTN_VOL"])
             self.logger.warning(f'{self.__class__.__name__} 対象の分析をクリック: 実施済み')
             self.selenium._random_sleep()
 

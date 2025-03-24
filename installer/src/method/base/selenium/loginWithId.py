@@ -183,7 +183,7 @@ class SingleSiteIDLogin:
     # reCAPTCHA OK
 
     def flow_login_id_input_url(
-        self, login_info: dict, login_url: str, id_text: str, pass_text: str, gss_info: Dict, err_datetime_cell: str, err_cmt_cell: str, timeout: int = 120, max_count: int=3
+        self, login_info: dict, login_url: str, id_text: str, pass_text: str, gss_info: Dict, err_datetime_cell: str, err_cmt_cell: str, timeout: int = 20, max_count: int=3
     ):
         retry_count = 0
         while retry_count < max_count:
