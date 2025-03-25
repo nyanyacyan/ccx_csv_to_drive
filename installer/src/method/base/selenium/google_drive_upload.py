@@ -45,7 +45,7 @@ class GoogleDriveUpload:
         try:
             parents_folder_id = self._get_parents_folder_id(parents_folder_url=parents_folder_url)
             self.logger.debug(f'file_path: {file_path}')
-            file_name = str(file_path).split('/')[-1]
+            file_name = Path(file_path).name
             self.logger.debug(f'file_name: {file_name}')
 
             if account_name:
