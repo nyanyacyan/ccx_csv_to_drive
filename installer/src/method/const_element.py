@@ -41,7 +41,7 @@ class GssInfo(Enum):
         "LINE_NAME": "LINE登録名",
         "SIGN_UP_DATE": "登録日",
 
-        "DRIVE_PARENTS_URL": "https://drive.google.com/drive/folders/1Mmt1-cKcvZTc8JOMmpzMVURdQ66LIoHG",
+        "DRIVE_PARENTS_URL": "https://drive.google.com/drive/folders/17m3IFY35w-QWcwn39cM8BEAk7qWQwVts",
     }
 
 

@@ -122,9 +122,9 @@ class FollowerDownloadFlow:
 
 
         except Exception as e:
-            error_comment = "フォロワーダウンロードflow処理中にエラーが発生"
+            error_comment = f"フォロワーダウンロードflow処理中にエラーが発生: {e}"
 
-            self.logger.error(f"{self.__class__.__name__} {error_comment}: {e}")
+            self.logger.error(f"{self.__class__.__name__} {error_comment}")
 
             # エラータイムスタンプ
             self.gss_write.write_data_by_url(gss_info=self.const_gss_info, cell=err_datetime_cell, input_data=self.timestamp)

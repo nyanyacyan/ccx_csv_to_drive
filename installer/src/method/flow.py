@@ -214,12 +214,14 @@ class SingleProcess:
             self.gss_write.write_data_by_url(gss_info=gss_info, cell=err_cmt_cell, input_data=timeout_comment)
 
         except Exception as e:
-            self.logger.error(f'{self.__class__.__name__} 処理中にエラーが発生 {e}')
+            process_error_comment = f"{self.__class__.__name__} 処理中にエラーが発生 {e}"
+            self.logger.error(process_error_comment)
             # エラータイムスタンプ
-            self.gss_write.write_data_by_url(gss_info=gss_info, cell=err_datetime_cell, input_data=self.timestamp)
+            self.logger.debug(f'self.timestamp: {self.timestamp}')
+            self.gss_write.write_data_by_url(gss_info=gss_info, cell=err_datetime_cell, input_data=self.timestamp_two)
 
             # エラーコメント
-            self.gss_write.write_data_by_url(gss_info=gss_info, cell=err_cmt_cell, input_data=timeout_comment)
+            self.gss_write.write_data_by_url(gss_info=gss_info, cell=err_cmt_cell, input_data=process_error_comment)
 
         finally:
             delete_count = 0

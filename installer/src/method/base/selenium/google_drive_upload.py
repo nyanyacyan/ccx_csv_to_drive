@@ -66,6 +66,7 @@ class GoogleDriveUpload:
 
         except Exception as e:
             self.logger.error(f'{self.__class__.__name__} ファイルアップロード中にエラーが発生: \n{e}')
+            raise
 
     #!###################################################################################
 
@@ -130,7 +131,8 @@ class GoogleDriveUpload:
             results = drive_service.files().list(q=query, fields="files(id, name)").execute()
             self.logger.debug(f'results: {results}')
         except Exception as e:
-            self.logger.error(f'{self.__class__.__name__} ファイルアップロード中にエラーが発生: \n{e}')
+            self.logger.error(f'{self.__class__.__name__} ファイルアップロード中にエラーが発生: {e}')
+            raise
 
         # レスポンスから'files'を抽出
         get_folders = results.get('files', [])

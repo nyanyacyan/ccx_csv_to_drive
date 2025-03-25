@@ -42,9 +42,10 @@ class GssWrite:
         self.path = BaseToPath()
         self.popup = Popup()
 
-        self.timestamp = datetime.now()
+        self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-    ####################################################################################
+
+    #!###################################################################################
     #✅ データをWorksheetに書き込む
 
     def write_data_by_url(self, gss_info: Dict, cell: str, input_data: Any, max_count: int=3):
@@ -75,7 +76,7 @@ class GssWrite:
         self.logger.error(f'{self.__class__.__name__} 最大リトライ回数 {max_count} 回を超過。処理を中断')
         raise TimeoutError(f"最大リトライ回数 {max_count} 回を超過しました。")
 
-    ####################################################################################
+    #!###################################################################################
     # ----------------------------------------------------------------------------------
     # Worksheetの作成
 
