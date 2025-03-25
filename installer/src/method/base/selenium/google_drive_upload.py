@@ -40,13 +40,20 @@ class GoogleDriveUpload:
     #!###################################################################################
     # ✅ ダウンロードリクエストを送信
 
-    def upload_file_to_drive(self, parents_folder_url: str, file_path: str, gss_info: Dict):
+    def upload_file_to_drive(self, parents_folder_url: str, file_path: str, gss_info: Dict, account_name: str):
+        file_name = ""
         try:
             parents_folder_id = self._get_parents_folder_id(parents_folder_url=parents_folder_url)
-            file_name = file_path.split('/')[-1]
+            self.logger.debug(f'file_path: {file_path}')
+            file_name = str(file_path).split('/')[-1]
+            self.logger.debug(f'file_name: {file_name}')
+
+            if account_name:
+                upload_folder_id = self._get_or_create_folder(gss_info=gss_info, child_folder_name=account_name, parent_folder_id=parents_folder_id)
+
             file_metadata = {
                 'name': file_name,
-                'parents': [parents_folder_id]
+                'parents': [upload_folder_id]
             }
 
             with open(file_path, "rb") as f:
@@ -58,7 +65,7 @@ class GoogleDriveUpload:
                 self.logger.info(f'{file_name} のアップロード処理完了')
 
         except Exception as e:
-            self.logger.error(f'{self.__class__.__name__} ファイルアップロード中にエラーが発生: {file_name}\n{e}')
+            self.logger.error(f'{self.__class__.__name__} ファイルアップロード中にエラーが発生: \n{e}')
 
     #!###################################################################################
 
@@ -119,7 +126,11 @@ class GoogleDriveUpload:
 
         # drive_serviceへリクエスト→指定のファイルをくれ！
         drive_service = self._client(gss_info=gss_info)
-        results = drive_service.files().list(q=query, fields="files(id, name)").execute()
+        try:
+            results = drive_service.files().list(q=query, fields="files(id, name)").execute()
+            self.logger.debug(f'results: {results}')
+        except Exception as e:
+            self.logger.error(f'{self.__class__.__name__} ファイルアップロード中にエラーが発生: \n{e}')
 
         # レスポンスから'files'を抽出
         get_folders = results.get('files', [])

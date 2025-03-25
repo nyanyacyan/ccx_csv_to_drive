@@ -4,6 +4,8 @@
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 # import
 import os
+from pathlib import Path
+
 import pandas as pd
 from typing import List
 
@@ -33,14 +35,20 @@ class SearchFileNameHead:
         try:
             search_file_name_parts = f"{file_name_head}*{extension}"
             self.logger.debug(f'search_file_name_parts: {search_file_name_parts}')
+            search_path = Path(search_folder_path)
+            self.logger.debug(f'search_path: {search_path}')
 
-            matching_files = list(search_folder_path.glob(search_file_name_parts))
+            for f in search_path.iterdir():
+                self.logger.debug(f"ファイル: {f.name}")
+
+            matching_files = list(search_path.glob(search_file_name_parts))
+            self.logger.debug(f'matching_files: {matching_files}')
 
             if not matching_files:
                 self.logger.warning(f'{self.__class__.__name__} 指定されているパターンのファイルがありませんでした: {file_name_head}*.{extension}')
                 return None
 
-            elif matching_files[1]:
+            elif len(matching_files) > 1:
                 self.logger.warning(f'{self.__class__.__name__} 指定のファイルが複数あるためエラー: {file_name_head}*.{extension}')
                 return None
 

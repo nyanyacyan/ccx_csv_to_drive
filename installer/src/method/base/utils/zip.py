@@ -36,7 +36,7 @@ class ZipOperation:
     def unzip_same_position(self, zipfile_path: str):
         try:
             base_dir = os.path.dirname(zipfile_path)
-            zip_name = os.path.splitext(os.path.basename(zipfile_path))
+            zip_name = os.path.splitext(os.path.basename(zipfile_path))[0]
             unzip_dir = os.path.join(base_dir, zip_name)
 
             unique_unzip_file_dir = self._get_unique_folder_path(unzip_dir)
@@ -55,7 +55,7 @@ class ZipOperation:
     # ----------------------------------------------------------------------------------
     # フォルダ名が被らないようにする
 
-    def _get_unique_folder_path(base_path: Path):
+    def _get_unique_folder_path(self, base_path: Path):
         if not os.path.exists(base_path):
             return base_path
 

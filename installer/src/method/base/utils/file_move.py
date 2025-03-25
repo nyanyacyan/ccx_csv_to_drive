@@ -121,4 +121,4 @@ class FileMove:
     # 移動先のpath
 
     def _result_dir_path(self, account_dir_name: str, sub_dir_name: str, file_name: str, extension: str):
-        return self.path.result_ac_date_sub_path(account_dir_name=account_dir_name, subDirName=sub_dir_name, fileName=file_name, extension=extension)
+        return self.path.result_ac_date_sub_path(account_dir_name=account_dir_name, sub_dir_name=sub_dir_name, file_name=file_name, extension=extension)

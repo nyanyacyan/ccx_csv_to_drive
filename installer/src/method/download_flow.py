@@ -4,7 +4,7 @@
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 # import
-import os
+import os, shutil
 from typing import Dict
 from datetime import datetime
 from selenium.webdriver.chrome.webdriver import WebDriver
@@ -81,7 +81,7 @@ class FollowerDownloadFlow:
 
         self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-    ####################################################################################
+    #!###################################################################################
     # 準備工程 スプシチェッカー > 写真のダウンロード > 動画のダウンロード
 
     def downloads_process( self, gss_row_data: Dict, err_datetime_cell: str, err_cmt_cell: str, ):
@@ -101,17 +101,20 @@ class FollowerDownloadFlow:
 
             # Zipファイルの移動 → result_output → アカウント → date → *zip
             new_zip_path = self.file_move.move_csv_dl_to_outputDir(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], sub_dir_name=self.const_download_kinds_info["DOWNLOAD_DIR_NAME"], file_name_head=self.const_download_kinds_info["ZIP_FILE_HEAD_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
+            self.selenium._random_sleep()
 
             # zipの解凍
             unzip_folder_dir = self.zip.unzip_same_position(zipfile_path=new_zip_path)
+            self.selenium._random_sleep()
 
             # 対象ファイルのPathを取得
             discovery_file = self.search_file_name_head.get_search_file_name_head(search_folder_path=unzip_folder_dir, file_name_head=self.const_download_kinds_info["CSV_FILE_HEAD_NAME"], extension=self.const_download_kinds_info["CSV_EXTENSION"])
+            self.selenium._random_sleep()
 
             # アップロード先のPathを取得
-            base_dir = os.path.dirname(discovery_file)  # ファイルまでのPathを取得
-            file_name, extension = os.path.splitext(os.path.basename(base_dir))  # file_nameのみ取得
-            upload_path = self._get_upload_file_path(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], file_name=file_name, extension=extension)
+            file_name = os.path.basename(discovery_file)  # ファイルまでのPathを取得
+            self.logger.debug(f'base_dir: {file_name}')
+            upload_path = self._get_upload_file_path(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], file_name=file_name)
 
             # アップロードファイルに移動
             self.file_move.base_file_move(old_path=discovery_file, new_path=upload_path)
@@ -132,7 +135,10 @@ class FollowerDownloadFlow:
         finally:
             # Zipを削除
             self._delete_file(file_path=new_zip_path)
+            self._delete_file(file_path=unzip_folder_dir)
+            return upload_path
 
+    #!###################################################################################
     # ----------------------------------------------------------------------------------
     # downloads path
 
@@ -145,18 +151,25 @@ class FollowerDownloadFlow:
     # ----------------------------------------------------------------------------------
     # アップロード用のpath
 
-    def _get_upload_file_path(self, account_dir_name: str, file_name: str, extension: str):
+    def _get_upload_file_path(self, account_dir_name: str, file_name: str):
         dir_name = self.const_download_kinds_info["UPLOAD_DIR_NAME"]
-        upload_file_path = self.path.result_ac_date_sub_file_path(account_dir_name=account_dir_name, sub_dir_name=dir_name, file_name=file_name, extension=extension)
+        self.logger.debug(f'dir_name: {dir_name}')
+        self.logger.debug(f'file_name: {file_name}')
+        upload_file_path = self.path.result_ac_date_sub_path_two(account_dir_name=account_dir_name, sub_dir_name=dir_name, file_name=file_name)
+        self.logger.debug(f'upload_file_path: {upload_file_path}')
         return upload_file_path
 
     # ----------------------------------------------------------------------------------
     # 不必要なファイルを削除
 
     def _delete_file(self, file_path: str):
-        if os.path.exists(file_path):
+        if os.path.isfile(file_path):
             os.remove(file_path)
-            self.logger.info(f'指定のファイルの削除を実施: {file_path}')
+            self.logger.info(f'指定のファイル削除を実施: {file_path}')
+
+        elif os.path.isdir(file_path):
+            shutil.rmtree(file_path)
+            self.logger.info(f'指定のフォルダ削除を実施: {file_path}')
 
         else:
             self.logger.error(f'{self.__class__.__name__} ファイルが存在しません: {file_path}')
@@ -207,7 +220,7 @@ class EngagementDownloadFlow:
 
         self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-    ####################################################################################
+    #!###################################################################################
     # 準備工程 スプシチェッカー > 写真のダウンロード > 動画のダウンロード
 
     def downloads_process( self, gss_row_data: Dict, err_datetime_cell: str, err_cmt_cell: str, ):
@@ -227,9 +240,11 @@ class EngagementDownloadFlow:
 
             # Zipファイルの移動 → result_output → アカウント → date → *zip
             new_zip_path = self.file_move.move_csv_dl_to_outputDir(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], sub_dir_name=self.const_download_kinds_info["DOWNLOAD_DIR_NAME"], file_name_head=self.const_download_kinds_info["ZIP_FILE_HEAD_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
+            self.selenium._random_sleep()
 
             # zipの解凍
             unzip_folder_dir = self.zip.unzip_same_position(zipfile_path=new_zip_path)
+            self.selenium._random_sleep()
 
             discovery_files = []
 
@@ -245,17 +260,14 @@ class EngagementDownloadFlow:
             for discovery_file in discovery_files:
 
                 # アップロード先のPathを取得
-                base_dir = os.path.dirname(discovery_file)  # ファイルまでのPathを取得
-                file_name, extension = os.path.splitext(os.path.basename(base_dir))  # file_nameのみ取得
-                upload_path = self._get_upload_file_path(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], file_name=file_name, extension=extension)
+                file_name = os.path.basename(discovery_file)  # ファイルまでのPathを取得
+                upload_path = self._get_upload_file_path(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], file_name=file_name)
 
                 # アップロードファイルに移動
                 self.file_move.base_file_move(old_path=discovery_file, new_path=upload_path)
                 upload_path_list.append(upload_path)
 
             self.logger.debug(f'upload_path_list: {upload_path_list}')
-            return upload_path_list
-
             self.logger.info(f'アカウント名: {gss_row_data[self.const_gss_info["NAME"]]} ダウンロード処理完了')
 
         except Exception as e:
@@ -269,16 +281,37 @@ class EngagementDownloadFlow:
             # エラーコメント
             self.gss_write.write_data_by_url(gss_info=self.const_gss_info, cell=err_cmt_cell, input_data=error_comment)
 
+        finally:
+            # Zipを削除
+            self._delete_file(file_path=new_zip_path)
+            self._delete_file(file_path=unzip_folder_dir)
+            return upload_path_list
 
+    #!###################################################################################
     # ----------------------------------------------------------------------------------
     # アップロード用のpath
 
-    def _get_upload_file_path(self, account_dir_name: str, file_name: str, extension: str):
+    def _get_upload_file_path(self, account_dir_name: str, file_name: str):
         dir_name = self.const_download_kinds_info["UPLOAD_DIR_NAME"]
-        upload_file_path = self.path.result_ac_date_sub_file_path(account_dir_name=account_dir_name, sub_dir_name=dir_name, file_name=file_name, extension=extension)
+        upload_file_path = self.path.result_ac_date_sub_path_two(account_dir_name=account_dir_name, sub_dir_name=dir_name, file_name=file_name)
         return upload_file_path
 
     # ----------------------------------------------------------------------------------
+    # 不必要なファイルを削除
+
+    def _delete_file(self, file_path: str):
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+            self.logger.info(f'指定のファイル削除を実施: {file_path}')
+
+        elif os.path.isdir(file_path):
+            shutil.rmtree(file_path)
+            self.logger.info(f'指定のフォルダ削除を実施: {file_path}')
+
+        else:
+            self.logger.error(f'{self.__class__.__name__} ファイルが存在しません: {file_path}')
+
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # **********************************************************************************
 # 一連の流れ
 
@@ -324,7 +357,7 @@ class PostDownloadFlow:
 
         self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-    ####################################################################################
+    #!###################################################################################
     # 準備工程 スプシチェッカー > 写真のダウンロード > 動画のダウンロード
 
     def downloads_process( self, gss_row_data: Dict, err_datetime_cell: str, err_cmt_cell: str, ):
@@ -343,26 +376,29 @@ class PostDownloadFlow:
             self.selenium._random_sleep()
 
             # Zipファイルの移動 → result_output → アカウント → date → *zip
-            new_zip_path = self.file_move.move_csv_dl_to_outputDir(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], sub_dir_name=self.const_download_kinds_info["DOWNLOAD_DIR_NAME"], file_name_head=self.const_download_kinds_info["ZIP_FILE_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
+            new_zip_path = self.file_move.move_csv_dl_to_outputDir(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], sub_dir_name=self.const_download_kinds_info["DOWNLOAD_DIR_NAME"], file_name_head=self.const_download_kinds_info["ZIP_FILE_HEAD_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
+            self.selenium._random_sleep()
 
             # zipの解凍
             unzip_folder_dir = self.zip.unzip_same_position(zipfile_path=new_zip_path)
+            self.selenium._random_sleep()
 
             # 対象ファイルのPathを取得
             discovery_file = self.search_file_name_head.get_search_file_name_head(search_folder_path=unzip_folder_dir, file_name_head=self.const_download_kinds_info["CSV_FILE_HEAD_NAME"], extension=self.const_download_kinds_info["CSV_EXTENSION"])
+            self.selenium._random_sleep()
 
             # アップロード先のPathを取得
-            base_dir = os.path.dirname(discovery_file)  # ファイルまでのPathを取得
-            file_name, extension = os.path.splitext(os.path.basename(base_dir))  # file_nameのみ取得
-            upload_path = self._get_upload_file_path(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], file_name=file_name, extension=extension)
+            file_name = os.path.basename(discovery_file)  # ファイルまでのPathを取得
+            self.logger.debug(f'base_dir: {file_name}')
+            upload_path = self._get_upload_file_path(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], file_name=file_name)
 
             # アップロードファイルに移動
             self.file_move.base_file_move(old_path=discovery_file, new_path=upload_path)
-
             self.logger.info(f'アカウント名: {gss_row_data[self.const_gss_info["NAME"]]} ダウンロード処理完了')
 
+
         except Exception as e:
-            error_comment = "エンゲージメントダウンロードflow処理中にエラーが発生"
+            error_comment = "フォロワーダウンロードflow処理中にエラーが発生"
 
             self.logger.error(f"{self.__class__.__name__} {error_comment}: {e}")
 
@@ -372,16 +408,49 @@ class PostDownloadFlow:
             # エラーコメント
             self.gss_write.write_data_by_url(gss_info=self.const_gss_info, cell=err_cmt_cell, input_data=error_comment)
 
+        finally:
+            # Zipを削除
+            self._delete_file(file_path=new_zip_path)
+            self._delete_file(file_path=unzip_folder_dir)
+            return upload_path
+
+    #!###################################################################################
+    # ----------------------------------------------------------------------------------
+    # downloads path
+
+    def _downloads_path(self):
+        home = self._home_path()
+        downloads_path = os.path.join(home, "Downloads")
+        self.logger.debug(f'downloads_path: {downloads_path}')
+        return downloads_path
 
     # ----------------------------------------------------------------------------------
     # アップロード用のpath
 
-    def _get_upload_file_path(self, account_dir_name: str, file_name: str, extension: str):
+    def _get_upload_file_path(self, account_dir_name: str, file_name: str):
         dir_name = self.const_download_kinds_info["UPLOAD_DIR_NAME"]
-        upload_file_path = self.path.result_ac_date_sub_file_path(account_dir_name=account_dir_name, sub_dir_name=dir_name, file_name=file_name, extension=extension)
+        self.logger.debug(f'dir_name: {dir_name}')
+        self.logger.debug(f'file_name: {file_name}')
+        upload_file_path = self.path.result_ac_date_sub_path_two(account_dir_name=account_dir_name, sub_dir_name=dir_name, file_name=file_name)
+        self.logger.debug(f'upload_file_path: {upload_file_path}')
         return upload_file_path
 
     # ----------------------------------------------------------------------------------
+    # 不必要なファイルを削除
+
+    def _delete_file(self, file_path: str):
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+            self.logger.info(f'指定のファイル削除を実施: {file_path}')
+
+        elif os.path.isdir(file_path):
+            shutil.rmtree(file_path)
+            self.logger.info(f'指定のフォルダ削除を実施: {file_path}')
+
+        else:
+            self.logger.error(f'{self.__class__.__name__} ファイルが存在しません: {file_path}')
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # **********************************************************************************
 # 一連の流れ
 
@@ -427,7 +496,7 @@ class StoriesDownloadFlow:
 
         self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-    ####################################################################################
+    #!###################################################################################
     # 準備工程 スプシチェッカー > 写真のダウンロード > 動画のダウンロード
 
     def downloads_process( self, gss_row_data: Dict, err_datetime_cell: str, err_cmt_cell: str, ):
@@ -446,26 +515,28 @@ class StoriesDownloadFlow:
             self.selenium._random_sleep()
 
             # Zipファイルの移動 → result_output → アカウント → date → *zip
-            new_zip_path = self.file_move.move_csv_dl_to_outputDir(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], sub_dir_name=self.const_download_kinds_info["DOWNLOAD_DIR_NAME"], file_name_head=self.const_download_kinds_info["ZIP_FILE_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
+            new_zip_path = self.file_move.move_csv_dl_to_outputDir(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], sub_dir_name=self.const_download_kinds_info["DOWNLOAD_DIR_NAME"], file_name_head=self.const_download_kinds_info["ZIP_FILE_HEAD_NAME"], extension=self.const_download_kinds_info["ZIP_EXTENSION"])
+            self.selenium._random_sleep()
 
             # zipの解凍
             unzip_folder_dir = self.zip.unzip_same_position(zipfile_path=new_zip_path)
+            self.selenium._random_sleep()
 
             # 対象ファイルのPathを取得
             discovery_file = self.search_file_name_head.get_search_file_name_head(search_folder_path=unzip_folder_dir, file_name_head=self.const_download_kinds_info["CSV_FILE_HEAD_NAME"], extension=self.const_download_kinds_info["CSV_EXTENSION"])
+            self.selenium._random_sleep()
 
             # アップロード先のPathを取得
-            base_dir = os.path.dirname(discovery_file)  # ファイルまでのPathを取得
-            file_name, extension = os.path.splitext(os.path.basename(base_dir))  # file_nameのみ取得
-            upload_path = self._get_upload_file_path(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], file_name=file_name, extension=extension)
+            file_name = os.path.basename(discovery_file)  # ファイルまでのPathを取得
+            self.logger.debug(f'base_dir: {file_name}')
+            upload_path = self._get_upload_file_path(account_dir_name=gss_row_data[self.const_gss_info["NAME"]], file_name=file_name)
 
             # アップロードファイルに移動
             self.file_move.base_file_move(old_path=discovery_file, new_path=upload_path)
-
             self.logger.info(f'アカウント名: {gss_row_data[self.const_gss_info["NAME"]]} ダウンロード処理完了')
 
         except Exception as e:
-            error_comment = "エンゲージメントダウンロードflow処理中にエラーが発生"
+            error_comment = "フォロワーダウンロードflow処理中にエラーが発生"
 
             self.logger.error(f"{self.__class__.__name__} {error_comment}: {e}")
 
@@ -475,13 +546,46 @@ class StoriesDownloadFlow:
             # エラーコメント
             self.gss_write.write_data_by_url(gss_info=self.const_gss_info, cell=err_cmt_cell, input_data=error_comment)
 
+        finally:
+            # Zipを削除
+            self._delete_file(file_path=new_zip_path)
+            self._delete_file(file_path=unzip_folder_dir)
+            return upload_path
+
+    #!###################################################################################
+    # ----------------------------------------------------------------------------------
+    # downloads path
+
+    def _downloads_path(self):
+        home = self._home_path()
+        downloads_path = os.path.join(home, "Downloads")
+        self.logger.debug(f'downloads_path: {downloads_path}')
+        return downloads_path
 
     # ----------------------------------------------------------------------------------
     # アップロード用のpath
 
-    def _get_upload_file_path(self, account_dir_name: str, file_name: str, extension: str):
+    def _get_upload_file_path(self, account_dir_name: str, file_name: str):
         dir_name = self.const_download_kinds_info["UPLOAD_DIR_NAME"]
-        upload_file_path = self.path.result_ac_date_sub_file_path(account_dir_name=account_dir_name, sub_dir_name=dir_name, file_name=file_name, extension=extension)
+        self.logger.debug(f'dir_name: {dir_name}')
+        self.logger.debug(f'file_name: {file_name}')
+        upload_file_path = self.path.result_ac_date_sub_path_two(account_dir_name=account_dir_name, sub_dir_name=dir_name, file_name=file_name)
+        self.logger.debug(f'upload_file_path: {upload_file_path}')
         return upload_file_path
 
     # ----------------------------------------------------------------------------------
+    # 不必要なファイルを削除
+
+    def _delete_file(self, file_path: str):
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+            self.logger.info(f'指定のファイル削除を実施: {file_path}')
+
+        elif os.path.isdir(file_path):
+            shutil.rmtree(file_path)
+            self.logger.info(f'指定のフォルダ削除を実施: {file_path}')
+
+        else:
+            self.logger.error(f'{self.__class__.__name__} ファイルが存在しません: {file_path}')
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

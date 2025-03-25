@@ -352,13 +352,27 @@ class BaseToPath:
     # Result > account_name > date > SubDir > file
 
     def result_ac_date_sub_path(self, account_dir_name: str, sub_dir_name: str, file_name: str, extension: str):
-        result_outputPath = self.getResultOutputPath()
-        dirPath = result_outputPath / account_dir_name / self.currentDate / sub_dir_name
+        result_output_path = self.getResultOutputPath()
+        dir_path = result_output_path / account_dir_name / self.currentDate / sub_dir_name
+        self.logger.debug(f'dir_path: {dir_path}')
         file = file_name + extension
-        file_path = dirPath / file
+        file_path = dir_path / file
         self.logger.warning(f"file_path: {file_path}")
         self.logger.debug(f"file_pathの型: {type(file_path)}")
-        self.isDirExists(path=dirPath)
+        self.isDirExists(path=dir_path)
+        self.logger.debug(f"file_path: {file_path}")
+        return file_path
+
+    # ----------------------------------------------------------------------------------
+    # Result > account_name > date > SubDir > file
+
+    def result_ac_date_sub_path_two(self, account_dir_name: str, sub_dir_name: str, file_name: str):
+        result_output_path = self.getResultOutputPath()
+        dir_path = result_output_path / account_dir_name / self.currentDate / sub_dir_name
+        file_path = dir_path / file_name
+        self.logger.warning(f"file_path: {file_path}")
+        self.logger.debug(f"file_pathの型: {type(file_path)}")
+        self.isDirExists(path=dir_path)
         self.logger.debug(f"file_path: {file_path}")
         return file_path
 

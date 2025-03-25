@@ -41,7 +41,7 @@ class GssInfo(Enum):
         "LINE_NAME": "LINE登録名",
         "SIGN_UP_DATE": "登録日",
 
-        "DRIVE_PARENTS_URL": "パネル",
+        "DRIVE_PARENTS_URL": "https://drive.google.com/drive/folders/1Mmt1-cKcvZTc8JOMmpzMVURdQ66LIoHG",
     }
 
 
@@ -131,15 +131,15 @@ class EngagementAnalysisElement(Enum):
         "ZIP_FILE_HEAD_NAME": "Instagramマイアカウント エンゲージメント分析",
 
         "ZIP_EXTENSION": ".zip",
-        "CSV_FILE_HEAD_FIRST_NAME": "エンゲージメントの推移",
-        "CSV_FILE_HEAD_SECOND_NAME": "プロフィールインサイトチャート",
+        "CSV_FILE_HEAD_FIRST_NAME": "エンゲージメントの推移",
+        "CSV_FILE_HEAD_SECOND_NAME": "プロフィールインサイトチャート",
 
         "CSV_EXTENSION": ".csv",
         "DOWNLOAD_DIR_NAME": "downloads",
         "UPLOAD_DIR_NAME": "uploads_to_google_drive",
 
         "ANALYSIS_BY": "",
-        "ANALYSIS_VOL": "//a[contains(text(), 'フォロワー分析')]",
+        "ANALYSIS_VOL": "//a[contains(text(), 'エンゲージメント分析')]",
         "BULK_DOWNLOAD_BTN_BY": "",
         "BULK_DOWNLOAD_BTN_VOL": "//button[.//span[contains(text(), '一括DL')]]",
         "": "",
@@ -152,18 +152,15 @@ class EngagementAnalysisElement(Enum):
 
 class PostAnalysisElement(Enum):
     CCX = {
-        "ZIP_FILE_HEAD_NAME": "Instagramマイアカウント エンゲージメント分析",
-
+        "ZIP_FILE_HEAD_NAME": "Instagramマイアカウント 投稿一覧",
         "ZIP_EXTENSION": ".zip",
-        "CSV_FILE_HEAD_FIRST_NAME": "エンゲージメントの推移",
-        "CSV_FILE_HEAD_SECOND_NAME": "プロフィールインサイトチャート",
-
+        "CSV_FILE_HEAD_NAME": "インサイト投稿一覧",
         "CSV_EXTENSION": ".csv",
         "DOWNLOAD_DIR_NAME": "downloads",
         "UPLOAD_DIR_NAME": "uploads_to_google_drive",
 
         "ANALYSIS_BY": "",
-        "ANALYSIS_VOL": "//a[contains(text(), 'フォロワー分析')]",
+        "ANALYSIS_VOL": "//a[contains(text(), '投稿一覧')]",
         "BULK_DOWNLOAD_BTN_BY": "",
         "BULK_DOWNLOAD_BTN_VOL": "//button[.//span[contains(text(), '一括DL')]]",
         "": "",
@@ -176,18 +173,15 @@ class PostAnalysisElement(Enum):
 
 class StoriesAnalysisElement(Enum):
     CCX = {
-        "ZIP_FILE_HEAD_NAME": "Instagramマイアカウント エンゲージメント分析",
-
+        "ZIP_FILE_HEAD_NAME": "Instagramマイアカウント ストーリーズ分析",
         "ZIP_EXTENSION": ".zip",
-        "CSV_FILE_HEAD_FIRST_NAME": "エンゲージメントの推移",
-        "CSV_FILE_HEAD_SECOND_NAME": "プロフィールインサイトチャート",
-
+        "CSV_FILE_HEAD_NAME": "ストーリーズ投稿一覧",
         "CSV_EXTENSION": ".csv",
         "DOWNLOAD_DIR_NAME": "downloads",
         "UPLOAD_DIR_NAME": "uploads_to_google_drive",
 
         "ANALYSIS_BY": "",
-        "ANALYSIS_VOL": "//a[contains(text(), 'フォロワー分析')]",
+        "ANALYSIS_VOL": "//a[contains(text(), 'ストーリーズ分析')]",
         "BULK_DOWNLOAD_BTN_BY": "",
         "BULK_DOWNLOAD_BTN_VOL": "//button[.//span[contains(text(), '一括DL')]]",
         "": "",
