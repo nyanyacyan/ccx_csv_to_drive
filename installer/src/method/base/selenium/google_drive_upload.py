@@ -48,6 +48,8 @@ class GoogleDriveUpload:
             file_name = Path(file_path).name
             self.logger.debug(f'file_name: {file_name}')
 
+            upload_folder_id = parents_folder_id  # デフォルトで親フォルダにアップする
+            self.logger.debug(f'upload_folder_id: {upload_folder_id}')
             if account_name:
                 upload_folder_id = self._get_or_create_folder(gss_info=gss_info, child_folder_name=account_name, parent_folder_id=parents_folder_id)
 
@@ -60,7 +62,7 @@ class GoogleDriveUpload:
                 uploader = MediaIoBaseUpload(f, mimetype="application/octet-stream", resumable=True)
 
                 drive_service = self._client(gss_info=gss_info)
-                drive_service.files().create(body=file_metadata, media_body=uploader, fields='id').execute()
+                drive_service.files().create(body=file_metadata, media_body=uploader, fields='id', supportsAllDrives=True).execute()
 
                 self.logger.info(f'{file_name} のアップロード処理完了')
 
@@ -112,7 +114,7 @@ class GoogleDriveUpload:
             "parents": [parents_folder_id]
         }
 
-        folder = drive_service.files().create(body=file_metadata, fields="id").execute()
+        folder = drive_service.files().create(body=file_metadata, fields="id", supportsAllDrives=True).execute()
         create_folder_id = folder["id"]
         self.logger.info(f"📁 フォルダ「{child_folder_name}」を作成しました（ID: {create_folder_id}）")
 
@@ -122,13 +124,15 @@ class GoogleDriveUpload:
     # 対象のフォルダの存在確認
 
     def _get_or_create_folder(self, gss_info: Dict, child_folder_name: str, parent_folder_id: str):
+        self.logger.debug(f'parent_folder_id: {parent_folder_id}')
         # ファイルを指定するための命令文
-        query = f"name='{child_folder_name}' and mimeType='application/vnd.google-apps.folder' and '{parent_folder_id}' in parents"
+        query = f"name='{child_folder_name}' and mimeType='application/vnd.google-apps.folder' and '{parent_folder_id}' in parents and trashed = false"
+        self.logger.debug(f'query: {query}')
 
         # drive_serviceへリクエスト→指定のファイルをくれ！
         drive_service = self._client(gss_info=gss_info)
         try:
-            results = drive_service.files().list(q=query, fields="files(id, name)").execute()
+            results = drive_service.files().list(q=query, fields="files(id, name)", supportsAllDrives=True, includeItemsFromAllDrives=True).execute()
             self.logger.debug(f'results: {results}')
         except Exception as e:
             self.logger.error(f'{self.__class__.__name__} ファイルアップロード中にエラーが発生: {e}')
