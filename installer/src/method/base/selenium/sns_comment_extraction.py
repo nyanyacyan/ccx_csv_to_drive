@@ -6,7 +6,6 @@ import pandas as pd
 from datetime import datetime
 from typing import List
 from youtube_comment_downloader import YoutubeCommentDownloader
-import snscrape.modules.twitter as sntwitter
 
 # 自作モジュール
 from method.base.utils.logger import Logger
@@ -139,20 +138,11 @@ class XComment:
 if __name__ == "__main__":
     currentDate = datetime.now().strftime("%m%d")
 
-    url = "https://twitter.com/wannyanheiwa/status/1897935573702393976"
+    url = "https://www.youtube.com/watch?v=46vDvkoS7E4"
     last_five = url[-5:]
-    post_date = "0308"
+    post_date = "0406"
 
-    user_name = "wannyanheiwa"
-    tweet_id = "1897935573702393976"
+    file_name = f"youtube_comments{post_date}-{last_five}.xlsx"
 
-
-    # file_name = f"youtube_comments{post_date}-{last_five}.xlsx"
-    file_name = f"X_comments{post_date}-{last_five}.xlsx"
-
-
-    # youtube_comment = YoutubeComment()
-    # youtube_comment.process(url=url, file_name=file_name)
-
-    X_comment = XComment()
-    X_comment.process(user_name=user_name, tweet_id=tweet_id, file_name=file_name)
+    youtube_comment = YoutubeComment()
+    youtube_comment.process(url=url, file_name=file_name)
